@@ -1,0 +1,15 @@
+{
+  "database": {
+    "host": "localhost",
+    "user": "admin",
+    "password": "admin",
+    "database": "idlebattle"
+  },
+  "server": {
+    "port": 8000,
+    "distPath": "./dist/",
+    "keyPath" : "./server/assets/key.pem",
+    "certPath" : "./server/assets/cert.pem",
+    "OAuthKeysPath": "./assets/key.json"
+  }
+}

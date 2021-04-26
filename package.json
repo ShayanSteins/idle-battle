@@ -1,0 +1,32 @@
+{
+  "name": "idle-battle",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "dependencies": {
+    "vue": "^2.6.12",
+    "vue-hot-reload-api": "^2.3.4"
+  },
+  "devDependencies": {
+    "@vue/component-compiler-utils": "^3.2.0",
+    "parcel-bundler": "^1.12.5",
+    "standard": "^16.0.3",
+    "vue-template-compiler": "^2.6.12"
+  },
+  "scripts": {
+    "dev": "parcel src/index.html",
+    "watch": "parcel watch src/index.html",
+    "build": "parcel build src/index.html",
+    "start": "parcel build src/index.html && node server/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShayanSteins/idle-battle.git"
+  },
+  "author": "Floriane Dutin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ShayanSteins/idle-battle/issues"
+  },
+  "homepage": "https://github.com/ShayanSteins/idle-battle#readme"
+}
