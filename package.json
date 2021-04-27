@@ -4,6 +4,7 @@
   "description": "",
   "private": true,
   "dependencies": {
+    "mariadb": "^2.5.3",
     "vue": "^2.6.12",
     "vue-hot-reload-api": "^2.3.4"
   },
