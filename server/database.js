@@ -40,8 +40,11 @@ class Database {
     return this.executeQuery('SELECT * FROM User WHERE email = ?', [email])
   }
 
-  setCredentials (cred) {
+  setGitHubCredentials (cred) {
     return this.executeQuery('INSERT INTO User (idUser, typeUser) VALUES (?, ?)', cred)
+  }
+  setClassicCredentials (cred) {
+    return this.executeQuery('INSERT INTO User (idUser, typeUser, email, hashedPassword, salt) VALUES (?, ?, ?, ?, ?)', cred)
   }
 }
 

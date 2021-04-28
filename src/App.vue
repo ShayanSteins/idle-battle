@@ -3,13 +3,10 @@
     <div class="loginDiv" v-if="!isLogged">
       <form @submit.prevent>
         <span class="error">{{ errorMsg }}</span>
+
         <label for="email">Email</label>
-        <input
-          type="email"
-          id="email"
-          v-model="email"
-          required
-        />
+        <input type="email" id="email" v-model="email" required />
+
         <label for="pwd">Password</label>
         <input
           type="password"
@@ -19,10 +16,11 @@
           maxlength="18"
           required
         />
-        <button @click="signUp">Sign Up</button>
-        <button @click="classicSignIn">Sign In</button>
+
+        <button @click="login('register')">Sign Up</button>
+        <button @click="login('signIn')">Sign In</button>
       </form>
-      <button @click="gitHubSignIn">Sign In with GitHub</button>
+      <button @click="gitHubLogin">Sign In with GitHub</button>
     </div>
 
     <div v-if="isLogged">
@@ -34,18 +32,18 @@
 
 <script>
 export default {
-  name: "App",
+  name: 'App',
   data() {
     return {
       isLogged: false,
-      errorMsg: "",
+      errorMsg: '',
       token: null,
-      email: "",
-      userPwd: "",
+      email: '',
+      userPwd: '',
     }
   },
   beforeMount() {
-    this.token = new URL(document.location).searchParams.get("access-token")
+    this.token = new URL(document.location).searchParams.get('access-token')
     if (this.token === null) {
       this.isLogged = false
     } else {
@@ -53,32 +51,35 @@ export default {
     }
   },
   methods: {
-    signUp: function () {
-      fetch("/register", {
+    login: function (type) {
+      fetch('/classic-login', {
         headers: {
-          "Content-Type": "application/json",
-          authorization: "Basic " + btoa(`${this.email}:${this.userPwd}`),
+          'Content-Type': 'application/json',
+          authorization:
+            'Basic ' + btoa(`${this.email}:${this.userPwd}:${type}`),
         },
       })
         .then((response) => {
           return response.json()
         })
         .then((datas) => {
-          console.log(datas)
+          if (datas.includes('Conflict') || datas.includes('Bad request')) {
+            this.errorMsg = datas
+          } else {
+            this.errorMsg = ''
+            window.location = `/index.html?access-token=${datas}`
+          }
         })
         .catch((err) => {
-          throw err
+          this.errorMsg = err
         })
     },
-    gitHubSignIn: function () {
-      window.location = "/github-login"
-    },
-    classicSignIn: function () {
-      console.log("signin classic")
+    gitHubLogin: function () {
+      window.location = '/github-login'
     },
     logout: function () {
       this.token = null
-      window.location = "/"
+      window.location = '/'
     },
   },
 }

@@ -4,7 +4,7 @@ CREATE DATABASE IF NOT EXISTS idlebattle;
 use idlebattle;
 
 CREATE TABLE IF NOT EXISTS User (
-  idUser VARCHAR(20) NOT NULL,
+  idUser VARCHAR(36) NOT NULL,
   typeUser SMALLINT(1) NOT NULL,
   email VARCHAR(320),
   hashedPassword VARCHAR(128),
@@ -28,11 +28,11 @@ CREATE TABLE IF NOT EXISTS Hero (
 
 CREATE TABLE IF NOT EXISTS Fight (
   idFight CHAR(36) NOT NULL,
-  idWinner CHAR(36) NOT NULL,
-  idLooser CHAR(36) NOT NULL,
+  idHero CHAR(36) NOT NULL,
+  opponentName VARCHAR(30) NOT NULL,
+  result SMALLINT(1) NOT NULL,
   dateFight DATETIME NOT NULL,
   report VARCHAR(2000),
-  FOREIGN KEY(idWinner) REFERENCES Hero(idHero),
-  FOREIGN KEY(idLooser) REFERENCES Hero(idHero),
+  FOREIGN KEY(idHero) REFERENCES Hero(idHero),
   PRIMARY KEY (idFight)
 );
