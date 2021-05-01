@@ -19,7 +19,7 @@ const mimeType = {
  * @property {String} distPath : chemin d'accès au dossier dist (parcel)
  */
 class Router {
-  constructor(config) {
+  constructor (config) {
     this.conf = config
     this.distPath = this.conf.distPath
     this.database = null
@@ -43,10 +43,10 @@ class Router {
     const fileName = url.pathname === '/' ? 'index.html' : url.pathname
     const extension = fileName.split('.')[fileName.split('.').length - 1]
     console.log(fileName)
-    
-    if(req.method === 'GET') {
+
+    if (req.method === 'GET') {
       const login = new Login(req, res, url, this.database)
-  
+
       if (fileName === '/github-login') {
         login.githubAuth(this.conf)
       } else if (fileName.match(/^(\/oauth-callback)/) !== null) {

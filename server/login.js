@@ -6,7 +6,7 @@ const env = {
 }
 
 class Login {
-  constructor(req, res, url, database) {
+  constructor (req, res, url, database) {
     this.req = req
     this.res = res
     this.url = url
@@ -62,7 +62,6 @@ class Login {
     } else {
       this.responseToClient({ statusCode: 403, returnedDatas: '403 - Access denied' })
     }
-
   }
 
   async loginUser () {
@@ -120,8 +119,8 @@ class Login {
 
   logout () {
     const allCookies = this.req.headers.cookie.split(';')
-    let expireCookies = []
-    for (let cookie of allCookies) {
+    const expireCookies = []
+    for (const cookie of allCookies) {
       expireCookies.push(`${cookie}; expires=${new Date(0)}`)
     }
     return this.responseToClient({
@@ -135,7 +134,7 @@ class Login {
 
   async returnDatas () {
     try {
-      if(this.req.headers.cookie) {
+      if (this.req.headers.cookie) {
         const userId = this.req.headers.cookie.split(';').find(a => a.startsWith('userId=')).split('=')[1]
         const exist = await this.getDbUserByToken(userId, env.GITHUB_AUTH)
         return this.responseToClient({
@@ -146,16 +145,15 @@ class Login {
           }
         })
       }
-      throw 'No cookie find.'
-    } catch(error) {
+      throw new Error('No cookie find.')
+    } catch (error) {
       console.log(error)
       return this.responseToClient({ statusCode: 400, returnedDatas: 'Bad request : An error occured during login process. Please try again.' })
     }
   }
 
   /**
-   * 
-   * @param {Object} params : {statusCode, returnedDatas, headers} 
+   * @param {Object} params : {statusCode, returnedDatas, headers, cookie}
    */
   responseToClient (params) {
     if (params.cookie) this.res.setHeader('Set-Cookie', params.cookie)
@@ -188,7 +186,7 @@ class Login {
         response.on('end', () => {
           concatedDatas = JSON.parse(concatedDatas.toString())
           if (concatedDatas.id !== undefined) resolve(concatedDatas.id)
-          reject('GitHub Auth : bad token')
+          reject(new Error('GitHub Auth : bad token'))
         })
       }).end()
     })
@@ -205,7 +203,6 @@ class Login {
     // console.log(dbCred[0])
     return dbCred[0]
   }
-
 }
 
 module.exports = Login

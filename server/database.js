@@ -43,6 +43,7 @@ class Database {
   setGitHubCredentials (cred) {
     return this.executeQuery('INSERT INTO User (idUser, typeUser) VALUES (?, ?)', cred)
   }
+  
   setClassicCredentials (cred) {
     return this.executeQuery('INSERT INTO User (idUser, typeUser, email, hashedPassword, salt) VALUES (?, ?, ?, ?, ?)', cred)
   }
