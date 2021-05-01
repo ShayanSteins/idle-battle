@@ -5,11 +5,15 @@ const mariadb = require('mariadb')
  * @property {mariadb.Pool} : Pool de connexion à la DB
  */
 class Database {
-  constructor (config) {
-    this.pool = mariadb.createPool(config)
-    this.testConnection().catch(error => {
+  constructor(config) {
+    try {
+      this.pool = mariadb.createPool(config)
+      this.testConnection()
+    } catch (error) {
       console.error(error)
-    })
+      throw error
+    }
+
   }
 
   /**
@@ -29,21 +33,22 @@ class Database {
     else return await this.pool.query(query, params)
   }
 
-  /**
-   * Récupération
-   */
   getUserById (idUser) {
     return this.executeQuery('SELECT * FROM User WHERE idUser = ?', [idUser])
   }
 
   getUserByEmail (email) {
     return this.executeQuery('SELECT * FROM User WHERE email = ?', [email])
+  }  
+
+  getHerosByUser (idUser) {
+    return this.executeQuery('SELECT * FROM Hero WHERE idUser = ?', [idUser])
   }
 
   setGitHubCredentials (cred) {
     return this.executeQuery('INSERT INTO User (idUser, typeUser) VALUES (?, ?)', cred)
   }
-  
+
   setClassicCredentials (cred) {
     return this.executeQuery('INSERT INTO User (idUser, typeUser, email, hashedPassword, salt) VALUES (?, ?, ?, ?, ?)', cred)
   }

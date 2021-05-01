@@ -16,25 +16,26 @@
           maxlength="18"
           required
         />
-        <input type="submit" value="Sign Up" name="register">
-        <input type="submit" value="Sign In" name="signIn">
-        <!-- <button @click="login('register')">Sign Up</button>
-        <button @click="login('signIn')">Sign In</button> -->
+        <input type="submit" value="Sign Up" name="register" />
+        <input type="submit" value="Sign In" name="signIn" />
       </form>
       <button @click="gitHubLogin">Sign In with GitHub</button>
     </div>
 
     <div v-if="isLogged">
       <button @click="logout">Log out</button>
-      <div v-if="user.heroes.length === 0">HERO CREATION</div>
+      <HeroDetail v-if="user.heroes.length === 0" :p_hero="newHero"></HeroDetail>
       <div v-else>Heroes list</div>
     </div>
   </div>
 </template>
 
 <script>
+import HeroDetail from './components/HeroDetail.vue'
+
 export default {
   name: 'App',
+  components: { HeroDetail },
   data() {
     return {
       isLogged: false,
@@ -46,10 +47,17 @@ export default {
       },
       user: {
         idUser: null,
-        typeUser: null,
-        email: '',
-        pwd: '',
         heroes: [],
+      },
+      newHero: {
+        idHero: null,
+        firstName: '',
+        rankLvl: 1,
+        skillPoint: 12,
+        health: 10,
+        attack: 0,
+        defense: 0,
+        magik: 0,
       },
     }
   },
@@ -59,6 +67,7 @@ export default {
         .split(';')
         .find((a) => a.startsWith('logged='))
         .split('=')[1]
+      this.getDatas()
     }
   },
   methods: {
@@ -68,14 +77,14 @@ export default {
           headers: {
             'Content-Type': 'application/json',
             authorization:
-              'Basic ' + btoa(`${this.form.email}:${this.form.pwd}:${e.submitter.name}`),
+              'Basic ' +
+              btoa(`${this.form.email}:${this.form.pwd}:${e.submitter.name}`),
           },
         })
-        if(!response.ok) {
+        if (!response.ok) {
           const message = await response.json()
           throw message
         }
-        
         this.getDatas()
       } catch (err) {
         this.errorMsg = err
@@ -86,7 +95,7 @@ export default {
     },
     async logout() {
       const response = await fetch('/logout', {
-        credentials: 'same-origin', // On envoie les cookie en secure
+        credentials: 'same-origin', // On envoie les cookies en secure
       })
       const datas = await response.json()
       if (response.status === 200 && datas.logged === false) {
@@ -97,18 +106,16 @@ export default {
     },
     async getDatas() {
       const response = await fetch('/init-datas', {
-        credentials: 'same-origin', // On envoie les cookie en secure
+        credentials: 'same-origin', // On envoie les cookies en secure
       })
 
       const datas = await response.json()
       if (response.status === 200) {
         this.user.idUser = datas.idUser
-        this.user.typeUser = datas.typeUser
-        // this.token = datas.idUser
+        this.user.heroes = datas.heroes
         this.form.email = ''
         this.form.pwd = ''
         this.isLogged = true
-        // window.location = `/index.html?access-token=${datas}`
       } else this.errorMsg = datas
     },
   },

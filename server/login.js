@@ -6,7 +6,7 @@ const env = {
 }
 
 class Login {
-  constructor (req, res, url, database) {
+  constructor(req, res, url, database) {
     this.req = req
     this.res = res
     this.url = url
@@ -42,7 +42,6 @@ class Login {
         response.on('data', async (datas) => {
           try {
             datas = JSON.parse(datas.toString())
-
             const userId = await this.checkToken(datas.access_token)
 
             let user = await this.getDbUserByToken(userId, env.GITHUB_AUTH)
@@ -51,8 +50,7 @@ class Login {
               user = { idUser: userId, typeUser: env.GITHUB_AUTH }
               await this.database.setGitHubCredentials([userId, env.GITHUB_AUTH])
             }
-            this.responseToClient({ statusCode: 301, cookie: [`token=${datas.access_token}; secure; HttpOnly`, 'logged=true'], headers: { Location: `https://${this.req.headers.host}/` } })
-            // this.responseToClient({ statusCode: 301, headers: { Location: `https://${this.req.headers.host}/index.html?access-token=${datas.access_token}` } })
+            this.responseToClient({ statusCode: 301, cookie: [`userId=${datas.access_token}; secure; HttpOnly`, 'logged=true'], headers: { Location: `https://${this.req.headers.host}/` } })
           } catch (error) {
             console.error(error)
             this.responseToClient({ statusCode: 403, returnedDatas: '403 - Access denied' })
@@ -136,12 +134,13 @@ class Login {
     try {
       if (this.req.headers.cookie) {
         const userId = this.req.headers.cookie.split(';').find(a => a.startsWith('userId=')).split('=')[1]
-        const exist = await this.getDbUserByToken(userId, env.GITHUB_AUTH)
+        const heroes = await this.database.getHerosByUser(userId)
+
         return this.responseToClient({
           statusCode: 200,
           returnedDatas: {
-            idUser: exist.userId,
-            typeUser: exist.type
+            idUser: userId,
+            heroes: heroes[0] === undefined ? [] : heroes[0]
           }
         })
       }
