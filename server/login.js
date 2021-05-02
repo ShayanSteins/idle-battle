@@ -1,16 +1,13 @@
 const https = require('https')
-
-const env = {
-  GITHUB_AUTH: 0,
-  CLASSIC_AUTH: 1
-}
+const { env } = require('./assets/utils.js')
+const Database = require('./database.js')
 
 class Login {
-  constructor(req, res, url, database) {
+  constructor (req, res, url) {
     this.req = req
     this.res = res
     this.url = url
-    this.database = database
+    this.database = Database.getInstance()
   }
 
   githubAuth (conf, firstStage = true) {
@@ -42,15 +39,15 @@ class Login {
         response.on('data', async (datas) => {
           try {
             datas = JSON.parse(datas.toString())
-            const userId = await this.checkToken(datas.access_token)
+            const userId = await this.checkGithubToken(datas.access_token)
 
-            let user = await this.getDbUserByToken(userId, env.GITHUB_AUTH)
+            let user = await this.doesUserDbExist(userId, env.ID_AUTH)
 
             if (user === undefined) {
-              user = { idUser: userId, typeUser: env.GITHUB_AUTH }
-              await this.database.setGitHubCredentials([userId, env.GITHUB_AUTH])
+              user = { idUser: userId, typeUser: env.ID_AUTH }
+              await this.database.setGitHubCredentials([userId, env.ID_AUTH])
             }
-            this.responseToClient({ statusCode: 301, cookie: [`userId=${datas.access_token}; secure; HttpOnly`, 'logged=true'], headers: { Location: `https://${this.req.headers.host}/` } })
+            this.responseToClient({ statusCode: 301, cookie: [`token=${datas.access_token}; secure; HttpOnly`, `userId=${userId}; secure; HttpOnly`, 'logged=true'], headers: { Location: `https://${this.req.headers.host}/` } })
           } catch (error) {
             console.error(error)
             this.responseToClient({ statusCode: 403, returnedDatas: '403 - Access denied' })
@@ -68,7 +65,7 @@ class Login {
       const [email, pwd, type] = credentials.split(':')
 
       try {
-        const exist = await this.getDbUserByToken(email, env.CLASSIC_AUTH)
+        const exist = await this.doesUserDbExist(email, env.EMAIL_AUTH)
         const { hasher, createUUID, compare } = require('./assets/utils.js')
 
         if (type === 'register') {
@@ -77,7 +74,7 @@ class Login {
             cred = [email, cred.hashedPassword, cred.salt]
             const newIdUser = createUUID()
             try {
-              await this.database.setClassicCredentials([newIdUser, env.CLASSIC_AUTH, ...cred])
+              await this.database.setClassicCredentials([newIdUser, env.EMAIL_AUTH, ...cred])
               return this.responseToClient({
                 statusCode: 200,
                 cookie: [`userId=${newIdUser}; secure; HttpOnly`, 'logged=true']
@@ -133,7 +130,7 @@ class Login {
   async returnDatas () {
     try {
       if (this.req.headers.cookie) {
-        const userId = this.req.headers.cookie.split(';').find(a => a.startsWith('userId=')).split('=')[1]
+        const userId = this.req.headers.cookie.split(';').find(a => a.includes('userId=')).split('=')[1]
         const heroes = await this.database.getHerosByUser(userId)
 
         return this.responseToClient({
@@ -163,7 +160,7 @@ class Login {
     else this.res.end()
   }
 
-  checkToken (token) {
+  checkGithubToken (token) {
     const opt = {
       port: 443,
       method: 'GET',
@@ -191,13 +188,13 @@ class Login {
     })
   }
 
-  async getDbUserByToken (token, type) {
+  async doesUserDbExist (id, type) {
     let dbCred = []
 
-    if (type === env.GITHUB_AUTH) {
-      dbCred = await this.database.getUserById(token)
+    if (type === env.ID_AUTH) {
+      dbCred = await this.database.getUserById(id)
     } else {
-      dbCred = await this.database.getUserByEmail(token)
+      dbCred = await this.database.getUserByEmail(id)
     }
     // console.log(dbCred[0])
     return dbCred[0]

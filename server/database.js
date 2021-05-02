@@ -5,7 +5,10 @@ const mariadb = require('mariadb')
  * @property {mariadb.Pool} : Pool de connexion à la DB
  */
 class Database {
-  constructor(config) {
+  constructor (config) {
+    if (Database.instance instanceof Database) return Database.instance
+    Database.instance = this
+
     try {
       this.pool = mariadb.createPool(config)
       this.testConnection()
@@ -14,6 +17,13 @@ class Database {
       throw error
     }
 
+    return this
+  }
+
+  static getInstance (config) {
+    if (Database.instance instanceof Database) return Database.instance
+    else if (config !== null) return new Database(config)
+    else throw new Error('Config file missing to initialize DB Connection')
   }
 
   /**
@@ -39,7 +49,7 @@ class Database {
 
   getUserByEmail (email) {
     return this.executeQuery('SELECT * FROM User WHERE email = ?', [email])
-  }  
+  }
 
   getHerosByUser (idUser) {
     return this.executeQuery('SELECT * FROM Hero WHERE idUser = ?', [idUser])
@@ -51,6 +61,10 @@ class Database {
 
   setClassicCredentials (cred) {
     return this.executeQuery('INSERT INTO User (idUser, typeUser, email, hashedPassword, salt) VALUES (?, ?, ?, ?, ?)', cred)
+  }
+
+  setHero (cred) {
+    return this.executeQuery('INSERT INTO Hero (idHero, firstName, rankLvl, skillPoint, health, attack, defense, magik, idUser) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', cred)
   }
 }
 

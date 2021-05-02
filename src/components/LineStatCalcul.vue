@@ -1,11 +1,11 @@
 <template>
   <div>
-    <label>{{ p_stat.name }} :</label>
-    <label>{{ p_stat.value }}</label>
-    <button @click="calculStat('less')">-</button>
-    <label>{{ newStat }}</label>
-    <button @click="calculStat('more')" :disabled="p_maxReached">+</button>
-    <label class="green">(+{{ usedSkillPoint }})</label>
+    <label>{{ p_statName }} :</label>
+    <label>{{ p_statValue }}</label>
+    <input type="button" @click="calculStat('less')" value="-" />
+    <label class="green">{{ newStatValue }}</label>
+    <input type="button" @click="calculStat('more')" value="+" :disabled="p_maxReached" />
+    <label>(+{{ usedSkillPoint }})</label>
   </div>
 </template>
 
@@ -14,36 +14,43 @@ export default {
   name: 'LineStatCalcul',
   data() {
     return {
-      newStat: this.p_stat.value,
+      newStatValue: this.p_statValue,
       usedSkillPoint: 0,
     }
   },
   props: {
-    p_stat: Object,
-    p_maxReached: Boolean
+    p_statName: String,
+    p_statType: String,
+    p_statValue: Number,
+    p_maxReached: Boolean,
   },
   methods: {
     calculStat(type) {
       if (type === 'more') {
-        this.newStat++
+        this.newStatValue++
       } else {
-        this.newStat =
-          this.newStat - 1 >= this.p_stat.value
-            ? this.newStat - 1
-            : this.newStat
+        this.newStatValue =
+          this.newStatValue - 1 >= this.p_statValue
+            ? this.newStatValue - 1
+            : this.newStatValue
       }
 
-      if (this.p_stat.value < this.newStat) {
-        if (this.p_stat.type === 'increment') {
-          this.usedSkillPoint = this.newStat - this.p_stat.value
-        } else if (this.p_stat.type === 'divideBy5') {
-          if (type === 'more') this.usedSkillPoint += Math.ceil(this.newStat / 5)
-          else this.usedSkillPoint -= Math.ceil((this.newStat + 1) / 5)
+      if (this.p_statValue < this.newStatValue) {
+        if (this.p_statType === 'increment') {
+          this.usedSkillPoint = this.newStatValue - this.p_statValue
+        } else if (this.p_statType === 'divideBy5') {
+          if (type === 'more')
+            this.usedSkillPoint += Math.ceil(this.newStatValue / 5)
+          else this.usedSkillPoint -= Math.ceil((this.newStatValue + 1) / 5)
         }
       } else {
         this.usedSkillPoint = 0
       }
-      this.$emit('changeSkill', {usedSkill: this.usedSkillPoint, statName: this.p_stat.name})
+      this.$emit('changeSkill', {
+        usedSkill: this.usedSkillPoint,
+        statName: this.p_statName,
+        statValue: this.newStatValue
+      })
     },
   },
 }

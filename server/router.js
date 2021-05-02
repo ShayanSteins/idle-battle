@@ -1,4 +1,5 @@
 const fs = require('fs')
+const DatasManager = require('./datasManager')
 const Login = require('./login')
 // const https = require('https')
 
@@ -22,15 +23,6 @@ class Router {
   constructor (config) {
     this.conf = config
     this.distPath = this.conf.distPath
-    this.database = null
-  }
-
-  /**
-   * Enregistrement du gestionnaire de base de données
-   * @param {Database} Database : gestionnaire de base de données
-   */
-  registerDataBase (Database) {
-    this.database = Database
   }
 
   /**
@@ -42,11 +34,10 @@ class Router {
     const url = new URL(req.url, `https://${req.headers.host}`)
     const fileName = url.pathname === '/' ? 'index.html' : url.pathname
     const extension = fileName.split('.')[fileName.split('.').length - 1]
+    const login = new Login(req, res, url)
     console.log(fileName)
 
     if (req.method === 'GET') {
-      const login = new Login(req, res, url, this.database)
-
       if (fileName === '/github-login') {
         login.githubAuth(this.conf)
       } else if (fileName.match(/^(\/oauth-callback)/) !== null) {
@@ -63,6 +54,11 @@ class Router {
       } else { // Cas nominal des fichiers html, js, css, images
         res.writeHead(200, { 'Content-Type': mimeType[extension] })
         res.end(fs.readFileSync(this.distPath + fileName))
+      }
+    } else { // POST method
+      const datasManager = new DatasManager(req, res, url).registerLogin(login)
+      if (fileName === '/create-hero') {
+        datasManager.createHero()
       }
     }
   }

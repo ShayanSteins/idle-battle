@@ -1,31 +1,42 @@
 <template>
   <div>
-    <div class="loginDiv" v-if="!isLogged">
-      <form @submit.prevent="login">
-        <span class="error">{{ errorMsg }}</span>
+    <header>
+      <span>Another not RPG game</span>
+    </header>
+    <div class="content">
+      <div class="loginDiv" v-if="!isLogged">
+        <form @submit.prevent="login">
+          <span class="error">{{ errorMsg }}</span>
 
-        <label for="email">Email</label>
-        <input type="email" id="email" v-model="form.email" required />
+          <label for="email">Email</label>
+          <input type="email" id="email" v-model="form.email" required />
 
-        <label for="pwd">Password</label>
-        <input
-          type="password"
-          id="pwd"
-          v-model="form.pwd"
-          minlength="8"
-          maxlength="18"
-          required
-        />
-        <input type="submit" value="Sign Up" name="register" />
-        <input type="submit" value="Sign In" name="signIn" />
-      </form>
-      <button @click="gitHubLogin">Sign In with GitHub</button>
-    </div>
+          <label for="pwd">Password</label>
+          <input
+            type="password"
+            id="pwd"
+            v-model="form.pwd"
+            minlength="8"
+            maxlength="18"
+            required
+          />
+          <input type="submit" value="Sign Up" name="register" />
+          <input type="submit" value="Sign In" name="signIn" />
+        </form>
+        <input type="button" @click="gitHubLogin" value="Sign In with GitHub" />
+      </div>
 
-    <div v-if="isLogged">
-      <button @click="logout">Log out</button>
-      <HeroDetail v-if="user.heroes.length === 0" :p_hero="newHero"></HeroDetail>
-      <div v-else>Heroes list</div>
+      <div v-if="isLogged">
+        <div class="menu">
+          <input type="button" @click="logout" value="Log out" />
+        </div>
+        <HeroDetail
+          v-if="user.heroes.length === 0"
+          :p_hero="newHero"
+          @addHero="addHero"
+        ></HeroDetail>
+        <div v-else>Heroes list</div>
+      </div>
     </div>
   </div>
 </template>
@@ -118,9 +129,31 @@ export default {
         this.isLogged = true
       } else this.errorMsg = datas
     },
+    addHero(hero) {
+      this.user.heroes.push(hero)
+    },
   },
 }
 </script>
 
 <style>
+html, body {
+  margin: 0;
+  height: 100vh;
+  font-family: sans-serif;
+  font-size: 1.2rem;
+  color: lightgray;
+  background-color: rgb(36, 36, 36);
+}
+header {
+  padding: 1rem 0;
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: white;
+  background-color: rgb(44, 88, 124);
+}
+.content {
+  padding: 0.5rem;
+}
 </style>

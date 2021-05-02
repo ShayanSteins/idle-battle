@@ -1,5 +1,10 @@
 const crypto = require('crypto')
 
+const env = {
+  ID_AUTH: 0,
+  EMAIL_AUTH: 1
+}
+
 /**
  * Fonction d'hachage de mot de passe. Retourne un objet contenant le salt de génération et le mdp haché
  * @param {String} password
@@ -44,6 +49,7 @@ const createUUID = () => {
 }
 
 module.exports = {
+  env,
   hasher,
   compare,
   createUUID

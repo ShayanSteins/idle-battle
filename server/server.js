@@ -10,7 +10,7 @@ const fs = require('fs')
 class Server {
   constructor (conf) {
     this.router = null
-    this.database = null
+    // this.database = null
     this.conf = conf
 
     const options = {
@@ -23,21 +23,11 @@ class Server {
   }
 
   /**
-   * Enregistrement du gestionnaire de base de données
-   * @param {Database} DataBase : gestionnaire de base de données
-   */
-  registerDataBase (DataBase) {
-    this.database = DataBase
-    return this
-  }
-
-  /**
    * Enregistrement du routeur web
    * @param {Router} Router : routeur web
    */
   registerRouter (Router) {
     this.router = Router
-    this.router.registerDataBase(this.database)
     this.server.on('request', (req, res) => { this.router.handle(req, res) })
     return this
   }
