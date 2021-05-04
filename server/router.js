@@ -10,6 +10,7 @@ const mimeType = {
   map: 'application/javascript',
   html: 'text/html',
   jpeg: 'image/jpeg',
+  png: 'image/png',
   jpg: 'image/jpeg',
   svg: 'image/svg+xml',
   ico: 'image/x-icon'
@@ -55,10 +56,15 @@ class Router {
         res.writeHead(200, { 'Content-Type': mimeType[extension] })
         res.end(fs.readFileSync(this.distPath + fileName))
       }
-    } else { // POST method
+    } else if (req.method === 'POST') {
       const datasManager = new DatasManager(req, res, url).registerLogin(login)
-      if (fileName === '/create-hero') {
-        datasManager.createHero()
+      if (fileName === '/create-update-hero') {
+        datasManager.createUpdateHero()
+      }
+    } else if (req.method === 'DELETE') {
+      const datasManager = new DatasManager(req, res, url).registerLogin(login)
+      if (fileName === '/remove-hero') {
+        datasManager.removeHero()
       }
     }
   }

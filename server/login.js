@@ -45,7 +45,7 @@ class Login {
 
             if (user === undefined) {
               user = { idUser: userId, typeUser: env.ID_AUTH }
-              await this.database.setGitHubCredentials([userId, env.ID_AUTH])
+              await this.database.setGitHubCredentials({ id: userId, type: env.ID_AUTH })
             }
             this.responseToClient({ statusCode: 301, cookie: [`token=${datas.access_token}; secure; HttpOnly`, `userId=${userId}; secure; HttpOnly`, 'logged=true'], headers: { Location: `https://${this.req.headers.host}/` } })
           } catch (error) {
@@ -70,11 +70,10 @@ class Login {
 
         if (type === 'register') {
           if (exist === undefined) {
-            let cred = hasher(pwd)
-            cred = [email, cred.hashedPassword, cred.salt]
+            const cred = hasher(pwd)
             const newIdUser = createUUID()
             try {
-              await this.database.setClassicCredentials([newIdUser, env.EMAIL_AUTH, ...cred])
+              await this.database.setClassicCredentials({ id: newIdUser, type: env.EMAIL_AUTH, emial: email, hash: cred.hashedPassword, salt: cred.salt })
               return this.responseToClient({
                 statusCode: 200,
                 cookie: [`userId=${newIdUser}; secure; HttpOnly`, 'logged=true']
@@ -132,18 +131,16 @@ class Login {
       if (this.req.headers.cookie) {
         const userId = this.req.headers.cookie.split(';').find(a => a.includes('userId=')).split('=')[1]
         const heroes = await this.database.getHerosByUser(userId)
-
         return this.responseToClient({
           statusCode: 200,
           returnedDatas: {
-            idUser: userId,
-            heroes: heroes[0] === undefined ? [] : heroes[0]
+            heroes: heroes[0] === undefined ? [] : Array.from(heroes)
           }
         })
       }
       throw new Error('No cookie find.')
     } catch (error) {
-      console.log(error)
+      console.error(error)
       return this.responseToClient({ statusCode: 400, returnedDatas: 'Bad request : An error occured during login process. Please try again.' })
     }
   }

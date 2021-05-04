@@ -1,7 +1,5 @@
 <template>
   <div>
-    <label>{{ p_statName }} :</label>
-    <label>{{ p_statValue }}</label>
     <input type="button" @click="calculStat('less')" value="-" />
     <label class="green">{{ newStatValue }}</label>
     <input type="button" @click="calculStat('more')" value="+" :disabled="p_maxReached" />
@@ -15,14 +13,14 @@ export default {
   data() {
     return {
       newStatValue: this.p_statValue,
-      usedSkillPoint: 0,
+      usedSkillPoint: 0
     }
   },
   props: {
     p_statName: String,
     p_statType: String,
     p_statValue: Number,
-    p_maxReached: Boolean,
+    p_maxReached: Boolean
   },
   methods: {
     calculStat(type) {
@@ -51,8 +49,8 @@ export default {
         statName: this.p_statName,
         statValue: this.newStatValue
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

@@ -1,61 +1,38 @@
 <template>
   <div>
-    <form @submit.prevent="create">
+    <div v-if="p_type === $env.CREATION" class="subTitle center">Creation</div>
+    <div class="error">{{ errorMsg }}</div>
+    <form @submit.prevent="createUpdate">
       <label>Name</label>
-      <input
-        type="text"
-        minlength="2"
-        maxlength="30"
-        v-model="newHero.firstName"
-        required
-      />
+      <label v-if="p_type">{{ p_hero.firstName }}</label>
+      <input v-else type="text" minlength="2" maxlength="30" v-model="newHero.firstName" required />
+      <input v-if="p_type === $env.EDITION" type="button" value="Delete" @click="remove" />
       <br />
 
       <label>Stats</label>
       <br />
       <label>Rank : {{ p_hero.rankLvl }}</label>
       <br />
-      <label
-        >Skill points availables :
-        <span :class="{ error: maxExceeded }">{{
-          newHero.skillPoint
-        }}</span></label
-      >
+      <label>Skill points availables : <span :class="{ error: maxExceeded }">{{ newHero.skillPoint }}</span></label>
       <br />
-      <LineStatCalcul
-        p_statName="Health"
-        p_statType="increment"
-        :p_statValue="p_hero.health"
-        :p_maxReached="maxReached"
-        @changeSkill="checkTotalSkillPointAmount"
-      ></LineStatCalcul>
 
-      <LineStatCalcul
-        p_statName="Attack"
-        p_statType="divideBy5"
-        :p_statValue="p_hero.attack"
-        :p_maxReached="maxReached"
-        @changeSkill="checkTotalSkillPointAmount"
-      ></LineStatCalcul>
+      <div v-for="stat in $stats" :key="stat.name" class="flex">
+        <label>{{ stat.displayName }}</label>
+        <label>{{ p_hero[stat.name] }}</label>
 
-      <LineStatCalcul
-        p_statName="Defense"
-        p_statType="divideBy5"
-        :p_statValue="p_hero.defense"
-        :p_maxReached="maxReached"
-        @changeSkill="checkTotalSkillPointAmount"
-      ></LineStatCalcul>
-
-      <LineStatCalcul
-        p_statName="Magik"
-        p_statType="divideBy5"
-        :p_statValue="p_hero.magik"
-        :p_maxReached="maxReached"
-        @changeSkill="checkTotalSkillPointAmount"
-      ></LineStatCalcul>
+        <LineStatCalcul v-if="p_hero.skillPoint > 0"
+          :p_statName="stat.displayName"
+          :p_statType="stat.type"
+          :p_statValue="p_hero[stat.name]"
+          :p_maxReached="maxReached"
+          ref="lineStat"
+          @changeSkill="checkTotalSkillPointAmount"
+        ></LineStatCalcul>
+      </div>
       <div>
-        <!-- <input type="button" value="Cancel" name="cancel"> -->
-        <input type="submit" value="Create" name="create" />
+        <input type="button" value="Cancel" @click="cancel">
+        <input v-if="p_type === $env.EDITION" type="submit" value="Save" name="save" />
+        <input v-else type="submit" value="Create" name="create" />
       </div>
     </form>
   </div>
@@ -63,44 +40,36 @@
 
 <script>
 import LineStatCalcul from './LineStatCalcul.vue'
-// const statsName = {
-//   HEALTH: 'Health',
-//   ATTACK: 'Attack',
-//   DEFENSE: 'Defense',
-//   MAGIK: 'Magik',
-// }
 
 export default {
   name: 'HeroDetail',
   components: { LineStatCalcul },
-  data() {
+  data () {
     return {
       newHero: {
+        idHero: this.p_hero.idHero,
         firstName: this.p_hero.firstName,
         rankLvl: this.p_hero.rankLvl,
         skillPoint: this.p_hero.skillPoint,
         health: this.p_hero.health,
         attack: this.p_hero.attack,
         defense: this.p_hero.defense,
-        magik: this.p_hero.magik,
+        magik: this.p_hero.magik
       },
-      skillPointsRepartition: new Map([
-        ['Health', 0],
-        ['Attack', 0],
-        ['Defense', 0],
-        ['Magik', 0],
-      ]),
+      skillPointsRepartition: this.initRepartitionSkillMap(),
       maxReached: false,
       maxExceeded: false,
+      errorMsg: null
     }
   },
   props: {
     p_hero: {
-      type: Object,
+      type: Object
     },
+    p_type: Number
   },
   methods: {
-    checkTotalSkillPointAmount(obj) {
+    checkTotalSkillPointAmount (obj) {
       this.newHero[obj.statName.toLowerCase()] = obj.statValue
       const totalSkillPointUsed = this.calculTotalSkillPointAmount(obj)
 
@@ -111,34 +80,76 @@ export default {
 
       this.newHero.skillPoint = this.p_hero.skillPoint - totalSkillPointUsed
     },
-    calculTotalSkillPointAmount(obj) {
+    calculTotalSkillPointAmount (obj) {
       this.skillPointsRepartition.set(obj.statName, obj.usedSkill)
       return Array.from(this.skillPointsRepartition.values()).reduce(
         (acc, curr) => acc + curr
       )
     },
-    async create() {
+    async createUpdate () {
       if (this.maxExceeded) {
-        // !!! make a popin to display error
-        alert('You spent too much skill point, please adjust your repartition.')
+        this.errorMsg = 'You spent too much skill point, please adjust your repartition.'
       } else {
-        const response = await fetch('/create-hero', {
-          method: 'POST',
-          credentials: 'same-origin',
-          body: JSON.stringify(this.newHero),
-        })
+        this.errorMsg = null
+        try {
+          const response = await fetch('/create-update-hero', {
+            method: 'POST',
+            credentials: 'same-origin',
+            body: JSON.stringify(this.newHero)
+          })
 
-        if (!response.ok) {
-          // !!! ERROR to fire
-        }
-        else {
-          this.$emit('addHero', this.newHero)
+          if (!response.ok) {
+            const message = await response.json()
+            throw message
+          }
+          else {
+            const datas = await response.json()
+            this.newHero.idHero = JSON.parse(datas).idHero
+            this.$emit('addHero', this.newHero)
+          }
+        } catch (error) {
+          this.errorMsg = error
         }
       }
     },
-    cancel() {
-      console.log('CANCEL')
+    cancel () {
+      this.skillPointsRepartition = this.initRepartitionSkillMap()
+      this.newHero = { ...this.p_hero }
+      this.maxReached = false
+      this.maxExceeded = false
+
+      for (const stat of this.$stats) {
+        const tmp = this.$refs.lineStat.find(a => a.p_statName === stat.displayName)
+        tmp._data.newStatValue = this.p_hero[stat.name]
+        tmp.usedSkillPoint = 0
+      }
     },
+    async remove () {
+      try {
+        const response = await fetch('remove-hero', {
+          method: 'DELETE',
+          credentials: 'same-origin',
+          body: JSON.stringify({ idHero: this.p_hero.idHero })
+        })
+
+        if (!response.ok) {
+          const message = await response.json()
+          throw message
+        }
+        else {
+          this.$emit('removeHero', this.newHero.idHero)
+        }
+      } catch (error) {
+        this.errorMsg = error
+      }
+    },
+    initRepartitionSkillMap () {
+      const map = new Map()
+      for (const stat of this.$stats) {
+        map.set(stat.displayName, 0)
+      }
+      return map
+    }
   },
 }
 </script>
@@ -146,5 +157,9 @@ export default {
 <style scoped>
 .error {
   color: red;
+}
+.flex {
+  display: flex;
+  justify-content: space-evenly;
 }
 </style>

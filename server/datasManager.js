@@ -15,10 +15,9 @@ class DatasManager {
     return this
   }
 
-  async createHero () {
+  async createUpdateHero () {
     try {
       if (this.req.headers.cookie) {
-        // console.log(this.req.headers.cookie)
         const userId = this.req.headers.cookie.split(';').find(a => a.includes('userId=')).split('=')[1]
         const user = await this.login.doesUserDbExist(userId, env.ID_AUTH)
         if (user !== undefined) {
@@ -26,17 +25,41 @@ class DatasManager {
           this.req.on('data', datas => {
             concatedDatas = Buffer.concat([concatedDatas, datas])
           })
-          this.req.on('end', async () => {
-            const temp = JSON.parse(concatedDatas.toString())
-            const newHero = [createUUID(), temp.firstName, temp.rankLvl, temp.skillPoint, temp.health, temp.attack, temp.defense, temp.magik, userId]
-            await this.database.setHero(newHero)
-            return this.login.responseToClient({ statusCode: 200 })
-          })
+          await new Promise(resolve => this.req.on('end', resolve))
+          const temp = JSON.parse(concatedDatas.toString())
+          const newHero = { idHero: temp.idHero === null ? createUUID() : temp.idHero, idUser: userId }
+          await this.database.setHero(Object.assign(temp, newHero))
+          return this.login.responseToClient({ statusCode: 200, returnedDatas: JSON.stringify({ idHero: newHero.idHero }) })
         }
       } else {
         throw new Error('No cookie find.')
       }
     } catch (error) {
+      console.error(error)
+      return this.login.responseToClient({ statusCode: 400, returnedDatas: 'Bad request : An error occured during process. Please try logout and login again.' })
+    }
+  }
+
+  async removeHero () {
+    try {
+      if (this.req.headers.cookie) {
+        const userId = this.req.headers.cookie.split(';').find(a => a.includes('userId=')).split('=')[1]
+        const user = await this.login.doesUserDbExist(userId, env.ID_AUTH)
+        if (user !== undefined) {
+          let concatedDatas = Buffer.alloc(0)
+          this.req.on('data', datas => {
+            concatedDatas = Buffer.concat([concatedDatas, datas])
+          })
+          await new Promise(resolve => this.req.on('end', resolve))
+          const temp = JSON.parse(concatedDatas.toString())
+          await this.database.removeHero(temp.idHero)
+          return this.login.responseToClient({ statusCode: 200 })
+        }
+      } else {
+        throw new Error('No cookie find.')
+      }
+    } catch (error) {
+      console.error(error)
       return this.login.responseToClient({ statusCode: 400, returnedDatas: 'Bad request : An error occured during process. Please try logout and login again.' })
     }
   }

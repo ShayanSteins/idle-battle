@@ -55,16 +55,47 @@ class Database {
     return this.executeQuery('SELECT * FROM Hero WHERE idUser = ?', [idUser])
   }
 
+  /**
+   * @param {Object} cred {id: idUser, type: typeUser}
+   * @returns
+   */
   setGitHubCredentials (cred) {
-    return this.executeQuery('INSERT INTO User (idUser, typeUser) VALUES (?, ?)', cred)
+    return this.executeQuery({ namedPlaceholders: true, sql: 'INSERT INTO User (idUser, typeUser) VALUES (:id, :type)' }, cred)
   }
 
+  /** 
+   * @param {Object} cred {id:idUser, type:typeUser, emial:email, hash:hashedPassword, salt:salt}
+   * @returns
+   */
   setClassicCredentials (cred) {
-    return this.executeQuery('INSERT INTO User (idUser, typeUser, email, hashedPassword, salt) VALUES (?, ?, ?, ?, ?)', cred)
+    return this.executeQuery({ namedPlaceholders: true, sql: 'INSERT INTO User (idUser, typeUser, email, hashedPassword, salt) VALUES (:id, :type, :email, :hash, :salt)' }, cred)
   }
 
+  /**
+   * @param {Object} cred { idHero:idHero, firstName:firstName, rankLvl:rankLvl, skillPoint:skillPoint, health:health, attack:attack, defense:defense, magik:magik, idUser: idUser }
+   * @returns
+   */
   setHero (cred) {
-    return this.executeQuery('INSERT INTO Hero (idHero, firstName, rankLvl, skillPoint, health, attack, defense, magik, idUser) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', cred)
+    return this.executeQuery(
+      {
+        namedPlaceholders: true,
+        sql: `INSERT INTO Hero (idHero, firstName, rankLvl, skillPoint, health, attack, defense, magik, idUser) 
+          VALUES (:idHero, :firstName, :rankLvl, :skillPoint, :health, :attack, :defense, :magik, :idUser) 
+          ON DUPLICATE KEY UPDATE 
+          idHero = VALUES(idHero), 
+          firstName = VALUES(firstName), 
+          rankLvl = VALUES(rankLvl), 
+          skillPoint = VALUES(skillPoint), 
+          health = VALUES(health), 
+          attack = VALUES(attack), 
+          defense = VALUES(defense), 
+          magik = VALUES(magik), 
+          idUser = VALUES(idUser)`
+      }, cred)
+  }
+
+  removeHero (idHero) {
+    return this.executeQuery('DELETE FROM Hero where idHero = ?', [idHero])
   }
 }
 

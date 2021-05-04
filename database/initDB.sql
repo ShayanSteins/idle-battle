@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS User (
   email VARCHAR(320),
   hashedPassword VARCHAR(128),
   salt VARCHAR(12),
-  PRIMARY KEY (idUser)
+  PRIMARY KEY (idUser),
+  UNIQUE KEY (email)
 );
 
 CREATE TABLE IF NOT EXISTS Hero (
