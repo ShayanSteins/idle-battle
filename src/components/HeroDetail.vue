@@ -125,22 +125,24 @@ export default {
       }
     },
     async remove () {
-      try {
-        const response = await fetch('remove-hero', {
-          method: 'DELETE',
-          credentials: 'same-origin',
-          body: JSON.stringify({ idHero: this.p_hero.idHero })
-        })
+      if (confirm('Are you sure you want to remove this Hero ?')) {
+        try {
+          const response = await fetch('remove-hero', {
+            method: 'DELETE',
+            credentials: 'same-origin',
+            body: JSON.stringify({ idHero: this.p_hero.idHero })
+          })
 
-        if (!response.ok) {
-          const message = await response.json()
-          throw message
+          if (!response.ok) {
+            const message = await response.json()
+            throw message
+          }
+          else {
+            this.$emit('removeHero', this.newHero.idHero)
+          }
+        } catch (error) {
+          this.errorMsg = error
         }
-        else {
-          this.$emit('removeHero', this.newHero.idHero)
-        }
-      } catch (error) {
-        this.errorMsg = error
       }
     },
     initRepartitionSkillMap () {

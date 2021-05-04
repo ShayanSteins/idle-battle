@@ -1,8 +1,29 @@
 <template>
   <div>
-    <header class="center">
-      <span>Another not RPG game</span>
+    <header>
+      <div class="title center">Another not RPG game</div>      
+      <div v-if="isLogged" class="nav">
+        <!-- <span id="menuButton" title="Menu"></span> -->
+        <button class="menuEl center" @click="navigation($screen.DETAIL)">
+          <div class="createImgMenu"></div>
+          <span>CREATE</span>
+        </button>
+        <button class="menuEl center" @click="navigation($screen.LIST)">
+          <div class="poolImgMenu"></div>
+          <span>POOL</span>
+        </button>
+        <button class="menuEl center" @click="navigation($screen.FIGHT)">
+          <div class="fightImgMenu"></div>
+          <span>FIGHT !</span>
+        </button>
+        <!-- <ul class="menu">
+          <li class="menuEl center" data-name="createMenu" @click="navigation"><div class="createImgMenu"></div><a>CREATE</a></li>
+          <li class="menuEl center" data-name="poolMenu" @click="navigation"><div class="poolImgMenu"></div><a>POOL</a></li>
+          <li class="menuEl center" data-name="fightMenu" @click="navigation"><div class="fightImgMenu"></div><a>FIGHT !</a></li>
+        </ul> -->
+      </div>
     </header>
+
     <div class="content">
       <div class="loginDiv center" v-if="!isLogged">
         <form @submit.prevent="login">
@@ -30,17 +51,23 @@
         <div class="menu">
           <input type="button" @click="logout" value="Log out" />
         </div>
+        <!-- <div v-if="heroes.length === 0">
+          It seems you don't have any Hero in your pool... <br>
+          Let's begin with create one ! <br>
+          <input type="button" class="button" value="Create" @click="navigation($screen.DETAIL)" />
+        </div> -->
         <HeroDetail
-          v-if="heroes.length === 0"
+          v-if="displayScreen === $screen.DETAIL"
           :p_hero="newHero"
           :p_type="$env.CREATION"
           @addHero="addHero"
         ></HeroDetail>
         <HeroList 
-          v-else 
+          v-if="displayScreen === $screen.LIST"
           :p_list="heroes" 
           @removeHeroFromList="removeHero"
         ></HeroList>
+        <Fight v-if="displayScreen === $screen.FIGHT"></Fight>
       </div>
     </div>
   </div>
@@ -49,10 +76,11 @@
 <script>
 import HeroDetail from './components/HeroDetail.vue'
 import HeroList from './components/HeroList.vue'
+import Fight from './components/Fight.vue'
 
 export default {
   name: 'App',
-  components: { HeroDetail, HeroList },
+  components: { HeroDetail, HeroList, Fight },
   data () {
     return {
       isLogged: false,
@@ -73,6 +101,7 @@ export default {
         defense: 0,
         magik: 0,
       },
+      displayScreen: null
     }
   },
   beforeMount () {
@@ -133,10 +162,14 @@ export default {
     },
     addHero (hero) {
       this.heroes.push(hero)
+      this.displayScreen = this.$screen.LIST
     },
     removeHero (idHero) {
       console.log(idHero)
       this.heroes = this.heroes.filter(a => a.idHero !== idHero)
+    },
+    navigation (screen) {
+      this.displayScreen = screen
     }
   },
 }
@@ -165,15 +198,90 @@ body {
 }
 
 header {
+  /* color: var(--main-white-color); */
+}
+.title {
   padding: 1rem 0;
   font-size: 1.8rem;
   font-weight: bold;
-  color: var(--main-white-color);
   border: var(--main-white-color) 3px dashed;
 }
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+/* .menu {
+  display: flex;
+  flex: auto;
+  flex-direction: row;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  justify-content: space-between;
+} */
+.nav .menuEl {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--main-black-color);
+  color: var(--main-white-color);
+  border:none;
+  border-right: 1px solid var(--main-white-color);
+  padding: 0.8rem;
+  width: 100%;
+  cursor: pointer;
+}
+.nav .menuEl:last-child {
+  /* border-bottom: none; */
+  border-right: none;
+}
+.nav .menuEl:hover {
+  background-color: var(--main-white-color);
+  color: var(--main-black-color);
+}
+.nav .menuEl div {
+  width: 22px;
+  height: 22px;
+  margin-right: 0.4rem;
+}
+.nav .menuEl .createImgMenu {
+  background: url("./assets/img/add_hero_white.png") 0%/100% no-repeat;
+}
+.nav .menuEl .poolImgMenu {
+  background: url("./assets/img/group_white.png") 0%/100% no-repeat;
+}
+.nav .menuEl .fightImgMenu {
+  background: url("./assets/img/fight_white.png") 0%/100% no-repeat;
+}
+.nav .menuEl:hover .createImgMenu {
+  background: url("./assets/img/add_hero_black.png") 0%/100% no-repeat;
+}
+.nav .menuEl:hover .poolImgMenu {
+  background: url("./assets/img/group_black.png") 0%/100% no-repeat;
+}
+.nav .menuEl:hover .fightImgMenu {
+  background: url("./assets/img/fight_black.png") 0%/100% no-repeat;
+}
+.nav span {
+  text-decoration: none;
+  font-size: 1.1rem;
+}
+/* .nav #menuButton {
+  display: none;
+  position: absolute;
+  top: 14px;
+  left: 10px;
+  font-size: 3rem;
+  width: 25px;
+  height: 25px;
+  background: url("./assets/img/menu_white.png") 0%/100% no-repeat;
+} */
+
 .content {
   padding: var(--content-padding);
-  height: 80vh;
+  /* height: 80vh; */
 }
 .subTitle {
   width: calc(100% - var(--content-padding));
@@ -223,9 +331,9 @@ header {
 .btnImg .img {
   width: 25px;
   height: 25px;
-  background: url("./assets/github_white.png") 0%/100% no-repeat;
+  background: url("./assets/img/github_white.png") 0%/100% no-repeat;
 }
 .btnImg:hover .img {
-  background: url("./assets/github.png") 0%/100% no-repeat;
+  background: url("./assets/img/github.png") 0%/100% no-repeat;
 }
 </style>

@@ -20,10 +20,17 @@ export const Store = {
   env: {
     CREATION: 0,
     EDITION: 1
+  },
+
+  screen: {
+    DETAIL: 0,
+    LIST: 1,
+    FIGHT: 2
   }
 }
 
 Store.install = function (Vue, option) {
   Vue.prototype.$stats = Store.stats
   Vue.prototype.$env = Store.env
+  Vue.prototype.$screen = Store.screen
 }

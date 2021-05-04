@@ -14,6 +14,7 @@
           <td>{{ hero.rankLvl }}</td>
           <td>{{ hero.firstName }}</td>
         </tr>
+        <tr v-if="p_list.length === 0" class="center"><td colspan="2">It seems you don't have any Hero in your pool...</td></tr>
       </tbody>
     </table>
 
