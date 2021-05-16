@@ -10,12 +10,22 @@
 <script>
 export default {
   name: 'LineStatCalcul',
-  data() {
+  data () {
     return {
       newStatValue: this.p_statValue,
       usedSkillPoint: 0
     }
   },
+  // computed: {
+  //   newStatValue: {
+  //     get: function () {
+  //       return this.p_statValue
+  //     },
+  //     set: function (val) {
+  //       this.newStatValue = val
+  //     }
+  //   }
+  // },
   props: {
     p_statName: String,
     p_statType: String,
@@ -23,7 +33,7 @@ export default {
     p_maxReached: Boolean
   },
   methods: {
-    calculStat(type) {
+    calculStat (type) {
       if (type === 'more') {
         this.newStatValue++
       } else {
@@ -44,11 +54,7 @@ export default {
       } else {
         this.usedSkillPoint = 0
       }
-      this.$emit('changeSkill', {
-        usedSkill: this.usedSkillPoint,
-        statName: this.p_statName,
-        statValue: this.newStatValue
-      })
+      this.$emit('changeSkill', this.usedSkillPoint, this.p_statName, this.newStatValue)
     }
   }
 }

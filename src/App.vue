@@ -25,9 +25,9 @@
     </header>
 
     <div class="content">
+      <span class="error">{{ errorMsg }}</span>
       <div class="loginDiv center" v-if="!isLogged">
         <form @submit.prevent="login">
-          <span class="error">{{ errorMsg }}</span>
           
           <label for="email" class="notDisplayed">Email</label>
           <input type="email" class="formInput" id="email" v-model="form.email" placeholder="Email" required />        
@@ -51,23 +51,24 @@
         <div class="menu">
           <input type="button" @click="logout" value="Log out" />
         </div>
-        <!-- <div v-if="heroes.length === 0">
-          It seems you don't have any Hero in your pool... <br>
-          Let's begin with create one ! <br>
-          <input type="button" class="button" value="Create" @click="navigation($screen.DETAIL)" />
-        </div> -->
         <HeroDetail
           v-if="displayScreen === $screen.DETAIL"
           :p_hero="newHero"
           :p_type="$env.CREATION"
+          :p_nbHeroes="heroes.length"
           @addHero="addHero"
         ></HeroDetail>
         <HeroList 
           v-if="displayScreen === $screen.LIST"
           :p_list="heroes" 
           @removeHeroFromList="removeHero"
+          @heroesUpdate="heroesUpdate"
         ></HeroList>
-        <Fight v-if="displayScreen === $screen.FIGHT"></Fight>
+        <Fight 
+          v-if="displayScreen === $screen.FIGHT"
+          :p_list="heroes"
+          @updateHero="heroesUpdate"
+        ></Fight>
       </div>
     </div>
   </div>
@@ -149,7 +150,7 @@ export default {
     },
     async getDatas () {
       const response = await fetch('/init-datas', {
-        credentials: 'same-origin', // On envoie les cookies en secure
+        credentials: 'same-origin',
       })
 
       const datas = await response.json()
@@ -164,8 +165,14 @@ export default {
       this.heroes.push(hero)
       this.displayScreen = this.$screen.LIST
     },
+    heroesUpdate (modifiedHero) {
+      const heroIndex = this.heroes.findIndex(a => a.idHero === modifiedHero.idHero)
+      if (heroIndex !== undefined) {
+        const updateHero = Object.assign(this.heroes[heroIndex], modifiedHero)
+        this.heroes[heroIndex] = { ...updateHero }
+      }
+    },
     removeHero (idHero) {
-      console.log(idHero)
       this.heroes = this.heroes.filter(a => a.idHero !== idHero)
     },
     navigation (screen) {
@@ -227,7 +234,7 @@ header {
   justify-content: center;
   background-color: var(--main-black-color);
   color: var(--main-white-color);
-  border:none;
+  border: none;
   border-right: 1px solid var(--main-white-color);
   padding: 0.8rem;
   width: 100%;

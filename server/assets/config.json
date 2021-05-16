@@ -3,7 +3,9 @@
     "host": "localhost",
     "user": "admin",
     "password": "admin",
-    "database": "idlebattle"
+    "database": "idlebattle",
+    "dateStrings": ["DATETIME"]
+
   },
   "server": {
     "port": 4040,

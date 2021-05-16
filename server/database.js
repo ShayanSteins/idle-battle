@@ -52,7 +52,29 @@ class Database {
   }
 
   getHerosByUser (idUser) {
-    return this.executeQuery('SELECT * FROM Hero WHERE idUser = ?', [idUser])
+    return this.executeQuery(`SELECT h.*, f.idFight, f.opponentName, f.result, f.dateFight, f.report FROM Hero as h LEFT JOIN Fight as f ON h.idHero = f.idHero 
+    WHERE h.idUser = ? ORDER BY h.idHero, f.dateFight DESC`
+    , [idUser])
+  }
+
+  /**
+    * 1 - take the closest opponent based on rank value
+    * 2 - opponent has to be free (it must not have fight in the past hour)
+    * 3 - take the opponent with the less number of fight with the character
+    * 4 - take a random opponent within the list
+    * @param {*} cred
+    * @returns
+    */
+  getOpponent (cred) {
+    return this.executeQuery({
+      namedPlaceholders: true, sql: `SELECT h.idHero, h.firstName, h.rankLvl, h.skillPoint, h.health, h.attack, h.defense, h.magik, 
+    ABS(:rankLvl - cast(h.rankLvl as signed)) as lvlRange,
+    (SELECT count(*) FROM Fight WHERE idHero = h.idHero) as nbFight
+  FROM Hero as h
+  WHERE h.idUser != :idUser
+  AND NOT EXISTS ( SELECT dateFight FROM Fight as f WHERE h.idHero = f.idHero AND f.dateFight > DATE_ADD(NOW(), INTERVAL -1 HOUR) ORDER BY dateFight DESC LIMIT 1 )
+  ORDER BY lvlRange, nbFight, RAND() LIMIT 1;`
+    }, cred)
   }
 
   /**
@@ -63,7 +85,7 @@ class Database {
     return this.executeQuery({ namedPlaceholders: true, sql: 'INSERT INTO User (idUser, typeUser) VALUES (:id, :type)' }, cred)
   }
 
-  /** 
+  /**
    * @param {Object} cred {id:idUser, type:typeUser, emial:email, hash:hashedPassword, salt:salt}
    * @returns
    */
@@ -92,6 +114,14 @@ class Database {
           magik = VALUES(magik), 
           idUser = VALUES(idUser)`
       }, cred)
+  }
+
+  setFight (cred) {
+    return this.executeQuery({
+      namedPlaceholders: true,
+      sql: `INSERT INTO Fight (idFight, idHero, opponentName, result, dateFight, report) VALUES (:idFight, :idHero, :opponentName, :result, NOW(), :report)
+      RETURNING idFight, idHero, opponentName, result, dateFight, report`
+    }, cred)
   }
 
   removeHero (idHero) {

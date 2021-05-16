@@ -23,6 +23,7 @@
       v-if="selectedHero"
       :p_hero="selectedHero" 
       :p_type="$env.EDITION"
+      @addHero="editHero"
       @removeHero="removeHero" 
     ></HeroDetail>
   </div>
@@ -48,6 +49,10 @@ export default {
     removeHero (idHero) {
       this.selectedHero = null
       this.$emit('removeHeroFromList', idHero)
+    },
+    editHero (hero) {
+      this.selectedHero = hero
+      this.$emit('heroesUpdate', hero)
     }
   },
 }
@@ -55,11 +60,11 @@ export default {
 
 <style scoped>
 table {
-  border: lightgray dashed 1px;
+  border: var(--main-white-color) dashed 1px;
   width: 100%;
 }
 tr {
-  border: lightgray dashed 1px;
+  border: var(--main-white-color) dashed 1px;
 }
 tr:hover {
   background-color: #464357;

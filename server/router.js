@@ -31,7 +31,7 @@ class Router {
    * @param {Request} req : requête à router
    * @param {Response} res : réponse reçue
    */
-  handle (req, res) {
+  async handle (req, res) {
     const url = new URL(req.url, `https://${req.headers.host}`)
     const fileName = url.pathname === '/' ? 'index.html' : url.pathname
     const extension = fileName.split('.')[fileName.split('.').length - 1]
@@ -57,14 +57,32 @@ class Router {
         res.end(fs.readFileSync(this.distPath + fileName))
       }
     } else if (req.method === 'POST') {
-      const datasManager = new DatasManager(req, res, url).registerLogin(login)
-      if (fileName === '/create-update-hero') {
-        datasManager.createUpdateHero()
+      try {
+        const datasManager = new DatasManager(req, res, url).registerLogin(login)
+        const { userId, temp } = await datasManager.checkCookieBefore()
+        if (userId !== undefined && temp !== undefined) {
+          if (fileName === '/create-update-hero') {
+            datasManager.createUpdateHero(userId, temp)
+          } else if (fileName === '/start-fight') {
+            datasManager.startFight(userId, temp)
+          }
+        }
+      } catch (error) {
+        console.error(error)
+        return this.login.responseToClient({ statusCode: 400, returnedDatas: 'Bad request : An error occured during process. Please try logout and login again.' })
       }
     } else if (req.method === 'DELETE') {
-      const datasManager = new DatasManager(req, res, url).registerLogin(login)
-      if (fileName === '/remove-hero') {
-        datasManager.removeHero()
+      try {
+        const datasManager = new DatasManager(req, res, url).registerLogin(login)
+        const { userId, temp } = await datasManager.checkCookieBefore()
+        if (userId !== undefined && temp !== undefined) {
+          if (fileName === '/remove-hero') {
+            datasManager.removeHero(temp)
+          }
+        }
+      } catch (error) {
+        console.error(error)
+        return this.login.responseToClient({ statusCode: 400, returnedDatas: 'Bad request : An error occured during process. Please try logout and login again.' })
       }
     }
   }

@@ -130,11 +130,53 @@ class Login {
     try {
       if (this.req.headers.cookie) {
         const userId = this.req.headers.cookie.split(';').find(a => a.includes('userId=')).split('=')[1]
-        const heroes = await this.database.getHerosByUser(userId)
+        let rawHeroes = await this.database.getHerosByUser(userId)
+        let heroes = []
+
+        if (rawHeroes[0] !== undefined) {
+          rawHeroes = Array.from(rawHeroes)
+          for (const hero of rawHeroes) {
+            const index = heroes.findIndex(a => a.idHero === hero.idHero)
+            if (index === -1) {
+              heroes.push({
+                idHero: hero.idHero,
+                firstName: hero.firstName,
+                rankLvl: hero.rankLvl,
+                skillPoint: hero.skillPoint,
+                health: hero.health,
+                attack: hero.attack,
+                defense: hero.defense,
+                magik: hero.magik,
+                fights: []
+              })
+              if(hero.idFight !== null) {
+                heroes[heroes.length-1].fights.push({
+                  idFight: hero.idFight,
+                  idHero: hero.idHero,
+                  opponentName: hero.opponentName,
+                  result: hero.result,
+                  dateFight: hero.dateFight,
+                  report: hero.report
+                })
+              }
+            }
+            else {
+              heroes[index].fights.push({
+                idFight: hero.idFight,
+                  idHero: hero.idHero,
+                  opponentName: hero.opponentName,
+                  result: hero.result,
+                  dateFight: hero.dateFight,
+                  report: hero.report
+              })
+            }
+          }
+        }
+
         return this.responseToClient({
           statusCode: 200,
           returnedDatas: {
-            heroes: heroes[0] === undefined ? [] : Array.from(heroes)
+            heroes: heroes
           }
         })
       }
