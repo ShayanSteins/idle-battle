@@ -8,7 +8,7 @@
       <label>Choose your hero :</label>
       <select v-model="selectedHero">
         <option disabled value="">Choose...</option>
-        <option v-for="hero in p_list" :key="hero.idHero" :value="hero.idHero">
+        <option v-for="hero in availableHeros" :key="hero.idHero" :value="hero.idHero">
           {{ hero.firstName }}
         </option>
       </select>
@@ -43,7 +43,27 @@ export default {
     }
   },
   props: {
-    p_list: Array
+    p_list: {
+      type: Array,
+      default: []
+    }
+  },
+  computed: {
+    availableHeros: function () {
+      let avHero = []
+      for (const hero of this.p_list) {
+        if (hero.attack > 0) {
+          if (hero.fights.length > 0) {
+            const latestFight = hero.fights.reduce((prev, curr) => (prev.dateFight > curr.dateFight) ? prev : curr)
+            let nowLessOneHour = new Date()
+            nowLessOneHour.setHours(nowLessOneHour.getHours() - 1)
+            if (new Date(latestFight.dateFight) > nowLessOneHour && !latestFight.result) continue
+          }
+          avHero.push(hero)
+        }
+      }
+      return avHero
+    }
   },
   methods: {
     async startFight () {
@@ -57,17 +77,15 @@ export default {
         if (!response.ok || response.status === 204) {
           throw datas
         }
-        
+
         this.result = datas
-        // console.log(datas)
-        datas.heroUpdate.fights.push(datas.fight)        
+        datas.heroUpdate.fights.push(datas.fight)
         this.$emit('updateHero', datas.heroUpdate)
         this.displayFight = true
 
       } catch (error) {
         this.errorMsg = error
       }
-
     }
   }
 }

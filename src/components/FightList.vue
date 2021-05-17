@@ -10,7 +10,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="fight in p_fights" :key="fight.idFight" @click="selectFight(fight)">
+        <tr v-for="fight in orderedFights" :key="fight.idFight" @click="selectFight(fight)">
           <td>{{ fight.dateFight.replaceAll('-', '/') }}</td>
           <td>{{ fight.opponentName }}</td>
           <td>{{ fight.result ? 'WON' : 'LOOSED' }}</td>
@@ -39,9 +39,19 @@ export default {
   props: {
     p_fights: Array
   },
+  computed: {
+    orderedFights: function () {
+      return this.p_fights.sort(this.compareDateFight)
+    }
+  },
   methods: {    
     selectFight (fight) {
       this.selectedFight = fight
+    },
+    compareDateFight (a, b) {
+      if (a.dateFight < b.dateFight) return 1
+      if (a.dateFight > b.dateFight) return -1
+      return 0
     }
   }
 }
