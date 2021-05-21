@@ -2,41 +2,39 @@
   <div>
     <header>
       <div class="title center">Another not RPG game</div>      
-      <div v-if="isLogged" class="nav">
-        <!-- <span id="menuButton" title="Menu"></span> -->
-        <button class="menuEl center" @click="navigation($screen.DETAIL)">
+      <div v-if="isLogged" class="nav flex fa-i-center">
+        <button class="menuEl center fa-i-center" title="Create" @click="navigation($screen.DETAIL)">
           <div class="createImgMenu"></div>
           <span>CREATE</span>
         </button>
-        <button class="menuEl center" @click="navigation($screen.LIST)">
+        <button class="menuEl center fa-i-center" title="Pool" @click="navigation($screen.LIST)">
           <div class="poolImgMenu"></div>
           <span>POOL</span>
         </button>
-        <button class="menuEl center" @click="navigation($screen.FIGHT)">
+        <button class="menuEl center fa-i-center" title="Fight !" @click="navigation($screen.FIGHT)">
           <div class="fightImgMenu"></div>
           <span>FIGHT !</span>
         </button>
-        <!-- <ul class="menu">
-          <li class="menuEl center" data-name="createMenu" @click="navigation"><div class="createImgMenu"></div><a>CREATE</a></li>
-          <li class="menuEl center" data-name="poolMenu" @click="navigation"><div class="poolImgMenu"></div><a>POOL</a></li>
-          <li class="menuEl center" data-name="fightMenu" @click="navigation"><div class="fightImgMenu"></div><a>FIGHT !</a></li>
-        </ul> -->
+        <button class="menuEl center fa-i-center" title="Log out" @click="logout">
+          <div class="logout"></div>
+          <span>Log out</span>
+        </button>
       </div>
     </header>
 
     <div class="content">
-      <span class="error">{{ errorMsg }}</span>
-      <div class="loginDiv center" v-if="!isLogged">
-        <form @submit.prevent="login">
+      <div class="loginDiv center flex fd-col" v-if="!isLogged">
+        <form @submit.prevent="login" class="flex fd-col">
+          <span class="error ta-l">{{ errorMsg }}</span>
           
           <label for="email" class="notDisplayed">Email</label>
-          <input type="email" class="formInput" id="email" v-model="form.email" placeholder="Email" required />        
+          <input type="email" class="formInput border-bl" id="email" v-model="form.email" placeholder="Email" required />        
         
           <label for="pwd" class="notDisplayed">Password</label>
-          <input type="password" class="formInput" id="pwd" v-model="form.pwd" placeholder="Password" minlength="8" maxlength="18" required />        
+          <input type="password" class="formInput border-bl" id="pwd" v-model="form.pwd" placeholder="Password" minlength="8" maxlength="18" required />        
 
           <div class="formButton">
-            <input type="submit" class="button" value="Sign Up" name="register" />
+            <input type="submit" class="button" value="Register" name="register" />
             <input type="submit" class="button" value="Sign In" name="signIn" />
           </div>
         </form>
@@ -48,9 +46,6 @@
       </div>
 
       <div v-if="isLogged">
-        <div class="menu">
-          <input type="button" @click="logout" value="Log out" />
-        </div>
         <HeroDetail
           v-if="displayScreen === $screen.DETAIL"
           :p_hero="newHero"
@@ -159,6 +154,7 @@ export default {
         this.form.email = ''
         this.form.pwd = ''
         this.isLogged = true
+        this.displayScreen = this.heroes.length > 0 ? this.$screen.LIST : this.$screen.DETAIL
       } else this.errorMsg = datas
     },
     addHero (hero) {
@@ -187,13 +183,19 @@ export default {
   --content-padding: 1rem;
   --main-black-color: rgba(36, 36, 36, 1);
   --main-white-color: rgba(236, 236, 236, 1);
+  --main-red-color: rgba(255, 36, 36, 1);
+}
+
+@font-face {
+  font-family: "Gameplay";
+  src: url("./assets/Gameplay.ttf") format("truetype");
 }
 
 html,
 body {
   margin: 0;
-  height: 100vh;
-  width: 100vw;
+  /* height: 100vh;
+  width: 100vw; */
   font-family: sans-serif;
   font-size: 1rem;
   color: var(--main-white-color);
@@ -203,34 +205,50 @@ body {
 .center {
   text-align: center;
 }
-
-header {
-  /* color: var(--main-white-color); */
+.ta-l {
+  text-align: left;
 }
+.border-bl {
+  border: none;
+  border-left: 2px solid var(--main-white-color);
+  border-bottom: 2px solid var(--main-white-color);
+}
+.error {
+  color: var(--main-red-color);
+}
+.flex {
+  display: flex;
+}
+.fd-col {
+  flex-direction: column;
+}
+.fa-i-center {
+  align-items: center;
+}
+
+input {
+  background-color: var(--main-black-color);
+  color: var(--main-white-color);
+}
+
 .title {
   padding: 1rem 0;
+  font-family: "Gameplay";
   font-size: 1.8rem;
-  font-weight: bold;
   border: var(--main-white-color) 3px dashed;
+}
+.subTitle {
+  font-family: "Gameplay";
+  width: calc(100% - var(--content-padding));
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
 }
 
 .nav {
-  display: flex;
   justify-content: space-between;
-  align-items: center;
 }
-/* .menu {
-  display: flex;
-  flex: auto;
-  flex-direction: row;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  justify-content: space-between;
-} */
 .nav .menuEl {
   display: flex;
-  align-items: center;
   justify-content: center;
   background-color: var(--main-black-color);
   color: var(--main-white-color);
@@ -241,7 +259,6 @@ header {
   cursor: pointer;
 }
 .nav .menuEl:last-child {
-  /* border-bottom: none; */
   border-right: none;
 }
 .nav .menuEl:hover {
@@ -253,6 +270,9 @@ header {
   height: 22px;
   margin-right: 0.4rem;
 }
+.nav .menuEl span {
+  display: none;
+}
 .nav .menuEl .createImgMenu {
   background: url("./assets/img/add_hero_white.png") 0%/100% no-repeat;
 }
@@ -261,6 +281,9 @@ header {
 }
 .nav .menuEl .fightImgMenu {
   background: url("./assets/img/fight_white.png") 0%/100% no-repeat;
+}
+.nav .menuEl .logout {
+  background: url("./assets/img/logout_white.png") 0%/100% no-repeat;
 }
 .nav .menuEl:hover .createImgMenu {
   background: url("./assets/img/add_hero_black.png") 0%/100% no-repeat;
@@ -271,40 +294,22 @@ header {
 .nav .menuEl:hover .fightImgMenu {
   background: url("./assets/img/fight_black.png") 0%/100% no-repeat;
 }
+.nav .menuEl:hover .logout {
+  background: url("./assets/img/logout_black.png") 0%/100% no-repeat;
+}
 .nav span {
   text-decoration: none;
   font-size: 1.1rem;
 }
-/* .nav #menuButton {
-  display: none;
-  position: absolute;
-  top: 14px;
-  left: 10px;
-  font-size: 3rem;
-  width: 25px;
-  height: 25px;
-  background: url("./assets/img/menu_white.png") 0%/100% no-repeat;
-} */
 
 .content {
   padding: var(--content-padding);
-  /* height: 80vh; */
-}
-.subTitle {
-  width: calc(100% - var(--content-padding));
-  font-weight: bold;
 }
 .notDisplayed {
   display: none;
 }
-.loginDiv {
-  display: flex;
-  flex-direction: column;
-}
 .loginDiv form {
   margin: 0.6rem;
-  display: flex;
-  flex-direction: column;
   justify-content: space-around;
 }
 .loginDiv .formInput {
@@ -315,7 +320,7 @@ header {
 }
 .formButton {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-evenly;
 }
 .button {
   padding: 0.4rem 0.5rem;
@@ -330,10 +335,12 @@ header {
 .btnImg {
   display: flex;
   align-items: center;
-  width: 180px;
   justify-content: space-around;
   margin: auto;
   margin-top: 1rem;
+}
+.button span {
+  margin-left: 0.6rem;
 }
 .btnImg .img {
   width: 25px;
@@ -342,5 +349,26 @@ header {
 }
 .btnImg:hover .img {
   background: url("./assets/img/github.png") 0%/100% no-repeat;
+}
+
+@media screen and (min-width: 600px) {
+  html,
+  body {
+    font-size: 1.1rem;
+  }
+
+  .loginDiv {
+    max-width: 600px;
+    margin: auto;
+  }
+
+  .button {
+    font-size: 1.1rem;
+    padding: 0.6rem 0.7em;
+  }
+
+  .nav .menuEl span {
+    display: block;
+  }
 }
 </style>

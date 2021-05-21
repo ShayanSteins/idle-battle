@@ -73,7 +73,7 @@ class Login {
             const cred = hasher(pwd)
             const newIdUser = createUUID()
             try {
-              await this.database.setClassicCredentials({ id: newIdUser, type: env.EMAIL_AUTH, emial: email, hash: cred.hashedPassword, salt: cred.salt })
+              await this.database.setClassicCredentials({ id: newIdUser, type: env.EMAIL_AUTH, email: email, hash: cred.hashedPassword, salt: cred.salt })
               return this.responseToClient({
                 statusCode: 200,
                 cookie: [`userId=${newIdUser}; secure; HttpOnly`, 'logged=true']

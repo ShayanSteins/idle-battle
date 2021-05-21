@@ -86,7 +86,7 @@ class Database {
   }
 
   /**
-   * @param {Object} cred {id:idUser, type:typeUser, emial:email, hash:hashedPassword, salt:salt}
+   * @param {Object} cred {id:idUser, type:typeUser, email:email, hash:hashedPassword, salt:salt}
    * @returns
    */
   setClassicCredentials (cred) {

@@ -6,11 +6,13 @@
     
     <div v-if="(p_type === $env.CREATION && p_nbHeroes < 10) || p_type === $env.EDITION">
       <div class="error" v-if="maxExceeded">You spent too much skill point, please adjust your repartition.</div>
-      <form @submit.prevent="createUpdate">
-        <label>Name</label>
-        <label v-if="p_type">{{ p_hero.firstName }}</label>
-        <input v-else type="text" minlength="2" maxlength="30" v-model="newHero.firstName" required />
-        <input v-if="p_type === $env.EDITION" type="button" value="Delete" @click="remove" />
+      <form @submit.prevent="createUpdate" class="flex fd-col">
+        <div class="flex fa-i-center">
+          <label for="heroName">Name : </label>
+          <label v-if="p_type">{{ p_hero.firstName }}</label>
+          <input v-else type="text" minlength="2" maxlength="30" class="inputHeroName border-bl" id="heroName" v-model="newHero.firstName" required />
+          <input v-if="p_type === $env.EDITION" type="button" value="Delete" @click="remove" />
+        </div>
         <br />
 
         <label>Stats</label>
@@ -20,7 +22,7 @@
         <label>Skill points availables : <span :class="{ error: maxExceeded }">{{ newHero.skillPoint }}</span></label>
         <br />
 
-        <div v-for="stat in $stats" :key="stat.name" class="flex">
+        <div v-for="stat in $stats" :key="stat.name" class="statsDiv flex">
           <label>{{ stat.displayName }}</label>
           <label>{{ p_hero[stat.name] }}</label>
 
@@ -178,11 +180,11 @@ export default {
 </script>
 
 <style scoped>
-.error {
-  color: red;
+.inputHeroName {
+  flex: 2 1 auto;
+  margin-left: 0.5rem;
 }
-.flex {
-  display: flex;
+.statsDiv {
   justify-content: space-evenly;
 }
 </style>
