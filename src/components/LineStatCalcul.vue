@@ -1,31 +1,26 @@
 <template>
-  <div>
-    <input type="button" @click="calculStat('less')" value="-" />
-    <label class="green">{{ newStatValue }}</label>
-    <input type="button" @click="calculStat('more')" value="+" :disabled="p_maxReached" />
-    <label>(+{{ usedSkillPoint }})</label>
+  <div class="variables">
+    <Button p_type="button" p_value="-" @click="calculStat('less')"></Button>
+    <!-- <input type="button" @click="calculStat('less')" value="-" /> -->
+    <span class="green">{{ newStatValue }}</span>
+    <Button p_type="button" p_value="+" :disabled="p_maxReached" @click="calculStat('more')"></Button>
+    <!-- <input type="button" @click="calculStat('more')" value="+" :disabled="p_maxReached" /> -->
+    <span>(+{{ usedSkillPoint }})</span>
   </div>
 </template>
 
 <script>
+import Button from '../basic-components/Button.vue'
+
 export default {
   name: 'LineStatCalcul',
+  components: { Button },
   data () {
     return {
       newStatValue: this.p_statValue,
       usedSkillPoint: 0
     }
   },
-  // computed: {
-  //   newStatValue: {
-  //     get: function () {
-  //       return this.p_statValue
-  //     },
-  //     set: function (val) {
-  //       this.newStatValue = val
-  //     }
-  //   }
-  // },
   props: {
     p_statName: String,
     p_statType: String,
@@ -61,8 +56,15 @@ export default {
 </script>
 
 <style scoped>
+.variables {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr 2fr);
+  grid-column-gap: 10px;
+  text-align: center;
+  align-items: center;
+}
 .green {
-  color: rgb(0, 128, 49);
+  color: var(--main-green-color);
   font-weight: bold;
 }
 </style>

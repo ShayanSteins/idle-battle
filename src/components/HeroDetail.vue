@@ -5,40 +5,46 @@
     <div v-if="p_type === $env.CREATION && p_nbHeroes === 10" class="error">Your pool is full. Remove a hero before created new one.</div>
     
     <div v-if="(p_type === $env.CREATION && p_nbHeroes < 10) || p_type === $env.EDITION">
-      <div class="error" v-if="maxExceeded">You spent too much skill point, please adjust your repartition.</div>
+      <div v-if="maxExceeded" class="error">You spent too much skill point, please adjust your repartition.</div>
       <form @submit.prevent="createUpdate" class="flex fd-col">
-        <div class="flex fa-i-center">
-          <label for="heroName">Name : </label>
-          <label v-if="p_type">{{ p_hero.firstName }}</label>
-          <input v-else type="text" minlength="2" maxlength="30" class="inputHeroName border-bl" id="heroName" v-model="newHero.firstName" required />
-          <input v-if="p_type === $env.EDITION" type="button" value="Delete" @click="remove" />
+        <div class="flex fa-i-center fj-c-between heroCategories">
+          <div class="flex f-grow"> 
+            <label for="heroName" class="heroCategoriesName">Name : </label>
+            <label v-if="p_type === $env.EDITION">{{ p_hero.firstName }}</label>
+            <input v-else type="text" minlength="2" maxlength="30" class="inputHeroName f-grow border-bl" id="heroName" v-model="newHero.firstName" required />          
+          </div>
+          <ButtonImage v-if="p_type === $env.EDITION" p_class="right btnIcon" p_type="button" title="Delete"
+            :p_img="$images.delete"
+            @click="remove"
+          ></ButtonImage>
         </div>
         <br />
 
-        <label>Stats</label>
-        <br />
-        <label>Rank : {{ p_hero.rankLvl }}</label>
-        <br />
-        <label>Skill points availables : <span :class="{ error: maxExceeded }">{{ newHero.skillPoint }}</span></label>
-        <br />
-
-        <div v-for="stat in $stats" :key="stat.name" class="statsDiv flex">
-          <label>{{ stat.displayName }}</label>
-          <label>{{ p_hero[stat.name] }}</label>
-
-          <LineStatCalcul v-if="p_hero.skillPoint > 0"
-            :p_statName="stat.displayName"
-            :p_statType="stat.type"
-            :p_statValue="p_hero[stat.name]"
-            :p_maxReached="maxReached"
-            ref="lineStat"
-            @changeSkill="checkTotalSkillPointAmount"
-          ></LineStatCalcul>
+        <div class="flex fj-c-between fa-i-center heroCategories">
+          <span class="heroCategoriesName">Stats</span>
+          <span v-if="p_type === $env.EDITION">Rank : {{ p_hero.rankLvl }}</span>
+          
         </div>
-        <div>
-          <input v-if="p_hero.skillPoint > 0" type="button" value="Cancel" @click="cancel">
-          <input v-if="p_type === $env.EDITION && p_hero.skillPoint" type="submit" value="Save" name="save" :disabled="maxExceeded"/>
-          <input v-if="p_type === $env.CREATION" type="submit" value="Create" name="create" :disabled="maxExceeded"/>
+        <div class="heroPropertiesDiv">
+          <span class="italic small">Skill points availables : <span :class="{ error: maxExceeded }">{{ newHero.skillPoint }}</span></span>
+          <br />
+          <div v-for="stat in $stats" :key="stat.name" class="statsDiv">
+            <span>- {{ stat.displayName }}</span>
+            <span>{{ p_hero[stat.name] }}</span>
+            <LineStatCalcul v-if="p_hero.skillPoint > 0"
+              :p_statName="stat.displayName"
+              :p_statType="stat.type"
+              :p_statValue="p_hero[stat.name]"
+              :p_maxReached="maxReached"
+              ref="lineStat"
+              @changeSkill="checkTotalSkillPointAmount"
+            ></LineStatCalcul>
+          </div>
+        </div>
+        <div class="actions">
+          <Button v-if="p_hero.skillPoint > 0" p_type="button" p_value="Cancel" p_name="cancel" @click="cancel"></Button>
+          <Button v-if="p_type === $env.EDITION && p_hero.skillPoint" p_type="submit" p_value="Save" p_name="save" :disabled="maxExceeded"></Button>
+          <Button v-if="p_type === $env.CREATION" p_type="submit" p_value="Create" p_name="create" :disabled="maxExceeded"></Button>
         </div>
 
         <div v-if="p_type === $env.EDITION">
@@ -51,12 +57,14 @@
 </template>
 
 <script>
+import Button from '../basic-components/Button.vue'
+import ButtonImage from '../basic-components/ButtonImage.vue'
 import LineStatCalcul from './LineStatCalcul.vue'
 import FightList from './FightList.vue'
 
 export default {
   name: 'HeroDetail',
-  components: { LineStatCalcul, FightList },
+  components: { Button, ButtonImage, LineStatCalcul, FightList },
   data () {
     return {
       newHero: {
@@ -132,11 +140,7 @@ export default {
       this.newHero = { ...this.p_hero }
       this.maxReached = false
       this.maxExceeded = false
-      // if (this.$refs.lineStat === undefined || this.$refs.lineStat.length <= 0) {
-      //   this.$nextTick(this.initStats)
-      // } else {
-        this.initStats()
-      // }
+      this.initStats()
     },
     async remove () {
       if (confirm('Are you sure you want to remove this Hero ?')) {
@@ -181,10 +185,26 @@ export default {
 
 <style scoped>
 .inputHeroName {
-  flex: 2 1 auto;
   margin-left: 0.5rem;
 }
+.heroCategories {
+  margin-top: 0.5rem;
+}
+.heroCategoriesName {
+  font-weight: bold;
+  font-size: 1.1rem;
+  padding-right: 0.4rem;
+}
+.heroPropertiesDiv {
+  padding-left: 1rem;
+}
 .statsDiv {
-  justify-content: space-evenly;
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+  align-items: center;
+}
+.actions {
+  margin-top: 1rem;
+  text-align: right;
 }
 </style>

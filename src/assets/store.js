@@ -1,3 +1,5 @@
+import Images from './img/*.png'
+
 export const Store = {
   stats: [{
     name: 'health',
@@ -33,4 +35,5 @@ Store.install = function (Vue, option) {
   Vue.prototype.$stats = Store.stats
   Vue.prototype.$env = Store.env
   Vue.prototype.$screen = Store.screen
+  Vue.prototype.$images = Images
 }
