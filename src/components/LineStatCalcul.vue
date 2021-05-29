@@ -1,16 +1,16 @@
 <template>
   <div class="variables">
-    <Button p_type="button" p_value="-" @click="calculStat('less')"></Button>
+    <Button p_type="button" p_class="smallBtn" p_value="-" @click="calculStat('less')"></Button>
     <!-- <input type="button" @click="calculStat('less')" value="-" /> -->
-    <span class="green">{{ newStatValue }}</span>
-    <Button p_type="button" p_value="+" :disabled="p_maxReached" @click="calculStat('more')"></Button>
+    <span class="green statVal">{{ newStatValue }}</span>
+    <Button p_type="button" p_class="smallBtn" p_value="+" :disabled="p_maxReached" @click="calculStat('more')"></Button>
     <!-- <input type="button" @click="calculStat('more')" value="+" :disabled="p_maxReached" /> -->
     <span>(+{{ usedSkillPoint }})</span>
   </div>
 </template>
 
 <script>
-import Button from '../basic-components/Button.vue'
+import Button from '~/basic-components/Button.vue'
 
 export default {
   name: 'LineStatCalcul',
@@ -63,8 +63,7 @@ export default {
   text-align: center;
   align-items: center;
 }
-.green {
-  color: var(--main-green-color);
+.statVal {
   font-weight: bold;
 }
 </style>

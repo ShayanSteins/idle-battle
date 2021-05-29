@@ -1,29 +1,30 @@
 <template>
   <div>
+    <div class="subTitle center">Fight</div>
     <div class="error">{{ errorMsg }}</div>
-    <div v-if="p_list.length === 0">
+    <div v-if="p_list.length === 0" class="emptyList center">
       It seems you don't have any Hero in your pool...
     </div>
     <div v-else>
-      <label>Choose your hero :</label>
-      <select v-model="selectedHero">
+      <div class="selectHeroLabel">Choose your hero :</div>
+      <select class="selectHero" v-model="selectedHero">
         <option disabled value="">Choose...</option>
         <option v-for="hero in availableHeros" :key="hero.idHero" :value="hero.idHero">
           {{ hero.firstName }}
         </option>
       </select>
-      <button @click="startFight" :disabled="selectedHero === ''">Fight !</button>
+      <Button p_class="fightBtn" p_value="Fight !" :disabled="selectedHero === ''" @click="startFight"></Button>
       
-      <div v-if="displayFight">
-        <div>------------------------------------------------</div>
+      <div v-if="displayFight" class="flex fd-col fa-i-center">
+        <div class="center">------------------------------------------------</div>
 
-        <span>FIGHT !</span>
+        <span class="subTitle fightTitle center">FIGHT !</span>
 
-        <div>{{ this.p_list.find(a => a.idHero === this.selectedHero).firstName }} VS {{ result.fight.opponentName }}</div>
+        <div><span class="green">{{ this.p_list.find(a => a.idHero === this.selectedHero).firstName }}</span> VS <span class="error">{{ result.fight.opponentName }}</span></div>
 
-        <div v-html="result.fight.report"></div>
+        <div v-html="result.fight.report" class="reportFight"></div>
 
-        <button v-if="result.fight.result === 1" @click="startFight">Next fight</button>
+        <Button p_value="Next fight" v-if="result.fight.result === 1" @click="startFight"></Button>
 
       </div>
 
@@ -32,8 +33,10 @@
 </template>
 
 <script>
+import Button from '~/basic-components/Button.vue'
 export default {
   name: 'Fight',
+  components: { Button },
   data () {
     return {
       selectedHero: '',
@@ -91,8 +94,43 @@ export default {
 }
 </script>
 
-<style scoped>
-.imgFight {
+<style>
+.emptyList {
+  margin: auto;
+}
+.selectHeroLabel {
+  margin-bottom: 0.4rem;
+}
+.selectHero {
+  padding: 0.4rem;
+  margin-bottom: 1rem;
   width: 100%;
+}
+.fightBtn {
+  width: 100%;
+}
+.fightTitle {
+  font-size: 4rem;
+}
+.reportFight {
+  width: -webkit-fill-available;
+}
+.turn {
+  font-weight: bold;
+  display: block;
+  font-size: 1.2rem;
+  margin-top: 1rem;
+}
+.point {
+  font-weight: bold;
+  color: var(--main-green-color);
+}
+
+@media screen and (min-width: 600px) {
+  .fightBtn {
+    display: block;
+    margin: auto;
+    width: 12rem;
+  }
 }
 </style>

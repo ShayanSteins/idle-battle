@@ -34,12 +34,12 @@
           <input type="password" class="formInput border-bl" id="pwd" v-model="form.pwd" placeholder="Password" minlength="8" maxlength="18" required />        
 
           <div class="formButton">
-            <Button p_type="submit" p_value="Register" p_name="register"></Button>
-            <Button p_type="submit" p_value="Sign In" p_name="signIn"></Button>
+            <Button p_type="submit" p_class="bigBtn" p_value="Register" p_name="register"></Button>
+            <Button p_type="submit" p_class="bigBtn" p_value="Sign In" p_name="signIn"></Button>
           </div>
         </form>
         <div>or</div>
-        <ButtonImage p_value="Sign In with GitHub" :p_img="$images.github" @click="gitHubLogin"></ButtonImage>
+        <ButtonImage p_class="withText" p_value="Sign In with GitHub" :p_img="$images.github" @click="gitHubLogin"></ButtonImage>
       </div>
 
       <div v-if="isLogged" class="tabDiv">
@@ -67,11 +67,11 @@
 </template>
 
 <script>
-import Button from './basic-components/Button.vue'
-import ButtonImage from './basic-components/ButtonImage.vue'
-import HeroDetail from './components/HeroDetail.vue'
-import HeroList from './components/HeroList.vue'
-import Fight from './components/Fight.vue'
+import Button from '~/basic-components/Button.vue'
+import ButtonImage from '~/basic-components/ButtonImage.vue'
+import HeroDetail from '~/components/HeroDetail.vue'
+import HeroList from '~/components/HeroList.vue'
+import Fight from '~/components/Fight.vue'
 
 export default {
   name: 'App',
@@ -181,6 +181,7 @@ export default {
 :root {
   --content-padding: 1rem;
   --main-black-color: rgba(36, 36, 36, 1);
+  --main-grey-color: rgba(88, 88, 88, 1);
   --main-white-color: rgba(236, 236, 236, 1);
   --main-red-color: rgba(255, 36, 36, 1);
   --main-green-color: rgba(1, 169, 52, 1);
@@ -238,6 +239,9 @@ body {
 .error {
   color: var(--main-red-color);
 }
+.green {  
+  color: var(--main-green-color);
+}
 
 input {
   background-color: var(--main-black-color);
@@ -252,7 +256,6 @@ input {
 }
 .subTitle {
   font-family: "Gameplay";
-  width: calc(100% - var(--content-padding));
   margin-bottom: 2rem;
   font-size: 1.3rem;
 }

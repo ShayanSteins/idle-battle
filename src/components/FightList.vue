@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <label>Fights :</label>          
+  <div>         
     <table>
       <thead>
         <tr>

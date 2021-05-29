@@ -21,7 +21,7 @@
         <br />
 
         <div class="flex fj-c-between fa-i-center heroCategories">
-          <span class="heroCategoriesName">Stats</span>
+          <span class="heroCategoriesName">Stats :</span>
           <span v-if="p_type === $env.EDITION">Rank : {{ p_hero.rankLvl }}</span>
           
         </div>
@@ -47,7 +47,8 @@
           <Button v-if="p_type === $env.CREATION" p_type="submit" p_value="Create" p_name="create" :disabled="maxExceeded"></Button>
         </div>
 
-        <div v-if="p_type === $env.EDITION">
+        <div v-if="p_type === $env.EDITION" class="heroCategories">          
+          <span class="heroCategoriesName">Fights :</span> 
           <FightList :p_fights="p_hero.fights"></FightList>
         </div>
 
@@ -57,10 +58,10 @@
 </template>
 
 <script>
-import Button from '../basic-components/Button.vue'
-import ButtonImage from '../basic-components/ButtonImage.vue'
-import LineStatCalcul from './LineStatCalcul.vue'
-import FightList from './FightList.vue'
+import Button from '~/basic-components/Button.vue'
+import ButtonImage from '~/basic-components/ButtonImage.vue'
+import LineStatCalcul from '~/components/LineStatCalcul.vue'
+import FightList from '~/components/FightList.vue'
 
 export default {
   name: 'HeroDetail',
@@ -202,6 +203,7 @@ export default {
   display: grid;
   grid-template-columns: 1fr 1fr 2fr;
   align-items: center;
+  margin-top: 0.3rem;
 }
 .actions {
   margin-top: 1rem;

@@ -84,7 +84,7 @@ class DatasManager {
     let healthB = heroB.health
 
     while (healthA > 0 && healthB > 0) {
-      report += `Turn n°${turn} : <br>`
+      report += `<div class="turn">Turn n°${turn} : </div>`
 
       let result = this.turn(heroA, heroB)
       report += result.report
@@ -96,18 +96,24 @@ class DatasManager {
 
       turn++
     }
-    if (healthB <= 0) winner = heroA
-    if (healthA <= 0) winner = heroB
-    report += `<br><br>WINNER : ${winner.firstName} ! <br>`
+    
+    if (healthB <= 0) {
+      report += `<br><br><span class="result">YOU WIN ! </span><br>`
+      winner = heroA
+    } else {
+      report += `<br><br><span class="result">YOU LOOSE... </span><br>`
+      winner = heroB
+    }
+
     return { report: report, winner: winner.idHero }
   }
 
   turn (heroA, heroB) {
     const result = this.attack(heroA.attack, heroA.magik, heroB.defense)
     if (result === null) {
-      return { report: `${heroA.firstName} missed attack.<br>`, loosedHealth: 0 }
+      return { report: `${heroA.firstName} <span class="missed">missed attack</span>.<br>`, loosedHealth: 0 }
     } else {
-      const report = `${heroA.firstName} attack with ${result.atkA}.<br>${heroB.firstName} loosed ${result.effectiveAttack} life point(s).<br>`
+      const report = `${heroA.firstName} attack with <span class="point">${result.atkA}</span>.<br>${heroB.firstName} loosed <span class="point">${result.effectiveAttack}</span> life point(s).<br><br>`
       return { report: report, loosedHealth: result.effectiveAttack }
     }
   }

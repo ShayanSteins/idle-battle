@@ -1,15 +1,17 @@
 <template>
   <div>
     <div class="subTitle center">Heroes list</div>
-    <div class="heroesContainer flex">
-      <div v-if="p_list.length === 0" class="center">It seems you don't have any Hero in your pool...</div>
-      <div v-for="hero in p_list" :key="hero.idHero" class="heroContainer center flex fd-col" @click="selectHero(hero)">
-        <span class="heroName">{{ hero.firstName }}</span>
-        <span class="small italic">Rank n°{{ hero.rankLvl }}</span>
+    <div class="flex">
+      <div v-if="p_list.length === 0" class="emptyList center">It seems you don't have any Hero in your pool...</div>
+      <div v-else class="heroesContainer flex">
+        <div v-for="hero in p_list" :key="hero.idHero" class="heroContainer center flex fd-col" @click="selectHero(hero)">
+          <span class="heroName">{{ hero.firstName }}</span>
+          <span class="small italic">Rank n°{{ hero.rankLvl }}</span>
+        </div>
+        <div class="center">------------------------------------------------</div>
       </div>
     </div>
 
-    <div class="center">------------------------------------------------</div>
     <HeroDetail 
       v-if="selectedHero"
       :p_hero="selectedHero" 
@@ -21,7 +23,7 @@
 </template>
 
 <script>
-import HeroDetail from './HeroDetail.vue'
+import HeroDetail from '~/components/HeroDetail.vue'
 export default {
   name: 'HeroList',
   components: { HeroDetail },
@@ -50,18 +52,25 @@ export default {
 </script>
 
 <style scoped>
+.emptyList {
+  margin: auto;
+}
 .heroesContainer {
-  /* height: 15rem; */
   flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: 45vh;
 }
 .heroContainer {
   border: solid 1px var(--main-white-color);
+  background-color: var(--main-black-color);
   justify-content: center;
   padding: 0.5rem 3rem;
   cursor: pointer;
 }
 .heroContainer:hover {
-  background-color: #464357;
+  /* background-color: #464357; */
+  filter: invert();
 }
 .heroName {
   font-weight: bold;

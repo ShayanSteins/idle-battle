@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import Button from './Button.vue'
+import Button from '~/basic-components/Button.vue'
 
 export default {
   name: "ButtonImage",
@@ -36,8 +36,7 @@ export default {
   height: 25px;
 }
 .btnIcon {
-  border: none;
-  background: none;
+  padding: 0.4rem;
   margin: 0;
 }
 
