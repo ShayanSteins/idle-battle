@@ -18,7 +18,7 @@ class Fight {
   }
 
   static create ({ opponentName, result, dateFight, turns }) {
-    if (opponentName != undefined && result != undefined && dateFight != undefined && turns != undefined) {
+    if (opponentName !== undefined && result !== undefined && dateFight !== undefined && turns !== undefined) {
       return new Fight({ idFight: createUUID(), idHero, opponentName, result, dateFight, turns })
     }
     return null
@@ -38,7 +38,7 @@ class Fight {
       turn.saveInDb(this.idFight)
     }
 
-    return savedFight
+    return savedFight[0]
   }
 
   addTurnFromSqlLine (sqlLine) {

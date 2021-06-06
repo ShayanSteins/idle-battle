@@ -20,7 +20,7 @@ class Turn {
   }
 
   static create ({ turnNumber, attackHeroA, loosedHealthHeroB, attackHeroB, loosedHealthHeroA }) {
-    if (turnNumber != undefined && attackHeroA != undefined && loosedHealthHeroB != undefined && attackHeroB != undefined && loosedHealthHeroA != undefined) {
+    if (turnNumber !== undefined && attackHeroA !== undefined && loosedHealthHeroB !== undefined && attackHeroB !== undefined && loosedHealthHeroA !== undefined) {
       return new Turn({ idTurn: createUUID(), turnNumber, attackHeroA, loosedHealthHeroB, attackHeroB, loosedHealthHeroA })
     }
   }

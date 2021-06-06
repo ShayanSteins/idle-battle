@@ -14,22 +14,25 @@ class Hero {
   idUser;
   fights = [];
 
-  constructor ({ idHero, firstName, skillPoint, health, attack, defense, magik, idUser }) {
+  constructor ({ idHero, firstName, rankLvl, skillPoint, health, attack, defense, magik, fights, idUser }) {
     this.idHero = idHero
     this.firstName = firstName
+    this.rankLvl = rankLvl ?? this.rankLvl
     this.skillPoint = skillPoint ?? this.skillPoint
     this.health = health ?? this.health
     this.attack = attack
     this.defense = defense
-    this.magik = magik,
+    this.magik = magik
+    this.fights = fights ?? []
     this.idUser = idUser
   }
 
-  static create ({ idHero, firstName, skillPoint, health, attack, defense, magik, fights, idUser }) {
-    if (firstName != undefined && skillPoint != undefined && health != undefined && attack != undefined && defense != undefined && magik != undefined) {
+  static create ({ idHero, firstName, rankLvl, skillPoint, health, attack, defense, magik, fights, idUser }) {
+    if (firstName !== undefined && rankLvl !== undefined && skillPoint !== undefined && health !== undefined && attack !== undefined && defense !== undefined && magik !== undefined) {
       return new Hero({ 
         idHero: idHero ?? createUUID(), 
-        firstName, 
+        firstName,
+        rankLvl,
         skillPoint, 
         health, 
         attack, 
@@ -67,9 +70,9 @@ class Hero {
     return this
   }
 
-  startFight (opponent) {
-    const fight = new Fight().fightWorkflow(this, opponent)
-    const dbFight = fight.saveInDb(this.idHero)
+  async startFight (opponent) {
+    const fight = new Fight().fightWorkflow({ ...this}, opponent)
+    const dbFight = await fight.saveInDb(this.idHero)
     fight.dateFight = dbFight.dateFight
     this.fights.push(fight)
 

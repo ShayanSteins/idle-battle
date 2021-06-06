@@ -47,6 +47,15 @@ export default {
       return this.p_fights.sort(this.compareDateFight)
     }
   },
+  watch: {
+    p_fights: {
+      immediate: true,
+      deep: true,
+      handler() {
+        this.selectedFight = null
+      }
+    }
+  },
   methods: {
     selectFight (fight) {
       this.selectedFight = fight

@@ -87,10 +87,10 @@ export default {
   },
   watch: {
     p_hero: {
+      deep: true,
       handler: function () {
         this.cancel()
-      },
-      deep: true
+      }
     }
   },
   props: {

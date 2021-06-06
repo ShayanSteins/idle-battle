@@ -60,7 +60,7 @@ class DatasManager {
     const opponent = await this.database.getOpponent({ idUser: userId, rankLvl: hero.rankLvl })
 
     if (opponent[0] !== undefined) {
-      let heroObject = Hero.create({ ...hero, idUser: userId }).startFight(opponent[0])
+      let heroObject = await Hero.create({ ...hero, idUser: userId }).startFight(opponent[0])
       return { statusCode: 200, returnedDatas: heroObject }
     }
     return { statusCode: 400, returnedDatas: 'Sorry... it seems that there is no hero to fight with you.' }

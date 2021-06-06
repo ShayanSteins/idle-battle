@@ -155,6 +155,7 @@ export default {
         this.form.pwd = ''
         this.isLogged = true
         this.displayScreen = this.heroes.length > 0 ? this.$screen.LIST : this.$screen.DETAIL
+        this.errorMsg = ''
       } else this.errorMsg = datas
     },
     addHero (hero) {
@@ -196,6 +197,7 @@ export default {
 html,
 body {
   margin: 0;
+  width: 100vw;
   font-family: sans-serif;
   font-size: 1rem;
   color: var(--main-white-color);
@@ -240,7 +242,7 @@ body {
 .error {
   color: var(--main-red-color);
 }
-.green {  
+.green {
   color: var(--main-green-color);
 }
 
@@ -265,6 +267,7 @@ input {
   position: fixed;
   top: 0;
   width: 100%;
+  z-index: 999;
 }
 .nav .menuEl {
   justify-content: center;
