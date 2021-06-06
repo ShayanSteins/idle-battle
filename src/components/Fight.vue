@@ -9,22 +9,22 @@
       <div class="selectHeroLabel">Choose your hero :</div>
       <select class="selectHero" v-model="selectedHero">
         <option disabled value="">Choose...</option>
-        <option v-for="hero in availableHeros" :key="hero.idHero" :value="hero.idHero">
+        <option v-for="hero in availableHeros" :key="hero.idHero" :value="hero">
           {{ hero.firstName }}
         </option>
       </select>
-      <Button p_class="fightBtn" p_value="Fight !" :disabled="selectedHero === ''" @click="startFight"></Button>
+      <Button p_class="fightBtn" p_value="Fight !" :disabled="!canHeFight" @click="startFight"></Button>
       
       <div v-if="displayFight" class="flex fd-col fa-i-center">
         <div class="center">------------------------------------------------</div>
 
         <span class="subTitle fightTitle center">FIGHT !</span>
 
-        <div><span class="green">{{ this.p_list.find(a => a.idHero === this.selectedHero).firstName }}</span> VS <span class="error">{{ result.fight.opponentName }}</span></div>
+        <div><span class="green">{{ selectedHero.firstName }}</span> VS <span class="error">{{ newFight.opponentName }}</span></div>
 
-        <div v-html="result.fight.report" class="reportFight"></div>
+        <FightWorkflow :p_heroName="selectedHero.firstName" :p_fight="newFight"></FightWorkflow>
 
-        <Button p_value="Next fight" v-if="result.fight.result === 1" @click="startFight"></Button>
+        <Button p_value="Next fight" v-if="canHeFight" @click="startFight"></Button>
 
       </div>
 
@@ -34,14 +34,15 @@
 
 <script>
 import Button from '~/basic-components/Button.vue'
+import FightWorkflow from './FightWorkflow.vue'
 export default {
   name: 'Fight',
-  components: { Button },
+  components: { Button, FightWorkflow },
   data () {
     return {
       selectedHero: '',
       displayFight: false,
-      result: null,
+      newFight: null,
       errorMsg: ''
     }
   },
@@ -66,6 +67,11 @@ export default {
         }
       }
       return avHero
+    },
+    canHeFight () {
+      if(this.selectedHero === '') return false
+      else if(this.newFight !== null && this.newFight.result === false) return false
+      return true
     }
   },
   methods: {
@@ -74,16 +80,16 @@ export default {
         const response = await fetch('/start-fight', {
           method: 'POST',
           credentials: 'same-origin',
-          body: JSON.stringify(this.p_list.find(a => a.idHero === this.selectedHero))
+          body: JSON.stringify(this.selectedHero)
         })
         const datas = await response.json()
-        if (!response.ok || response.status === 204) {
+        if (!response.ok || response.status !== 200) {
           throw datas
         }
 
-        this.result = datas
-        datas.heroUpdate.fights.push(datas.fight)
-        this.$emit('updateHero', datas.heroUpdate)
+        this.newFight = datas.fights[datas.fights.length - 1]
+        this.$emit('updateHero', datas)
+        this.errorMsg = ''
         this.displayFight = true
 
       } catch (error) {
@@ -111,19 +117,6 @@ export default {
 }
 .fightTitle {
   font-size: 4rem;
-}
-.reportFight {
-  width: -webkit-fill-available;
-}
-.turn {
-  font-weight: bold;
-  display: block;
-  font-size: 1.2rem;
-  margin-top: 1rem;
-}
-.point {
-  font-weight: bold;
-  color: var(--main-green-color);
 }
 
 @media screen and (min-width: 600px) {

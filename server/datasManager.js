@@ -1,141 +1,69 @@
-const { env, createUUID } = require('./assets/utils.js')
+const { createUUID } = require('./assets/utils.js')
 const Database = require('./database.js')
+const Hero = require('./components/Hero.js')
+const Fight = require('./components/Fight.js')
+const Turn = require('./components/Turn.js')
 
 class DatasManager {
-  constructor (req, res, url) {
-    this.req = req
-    this.res = res
-    this.url = url
+  constructor () {
     this.database = Database.getInstance()
-    this.login = null
   }
 
-  registerLogin (Login) {
-    this.login = Login
-    return this
-  }
+  async getAllUserDatas (userId) {
+    let rawDatas = await this.database.getHerosByUser(userId)
+    let heroes = []
 
-  async checkCookieBefore () {
-    try {
-      if (this.req.headers.cookie) {
-        const userId = this.req.headers.cookie.split(';').find(a => a.includes('userId=')).split('=')[1]
-        const user = await this.login.doesUserDbExist(userId, env.ID_AUTH)
-        if (user !== undefined) {
-          let concatedDatas = Buffer.alloc(0)
-          this.req.on('data', datas => {
-            concatedDatas = Buffer.concat([concatedDatas, datas])
+    if (rawDatas[0] !== undefined) {
+      rawDatas = Array.from(rawDatas)
+      for (const sqlLine of rawDatas) {
+        const indexH = heroes.findIndex(a => a.idHero === sqlLine.idHero)
+        if (indexH === -1) {
+          const hero = new Hero({
+            idHero: sqlLine.idHero,
+            firstName: sqlLine.firstName,
+            rankLvl: sqlLine.rankLvl,
+            skillPoint: sqlLine.skillPoint,
+            health: sqlLine.health,
+            attack: sqlLine.attack,
+            defense: sqlLine.defense,
+            magik: sqlLine.magik
           })
-          await new Promise(resolve => this.req.on('end', resolve))
-          const temp = JSON.parse(concatedDatas.toString())
-          return Promise.resolve({ userId: userId, temp: temp })
+          if (sqlLine.idFight !== null) hero.addFightFromSqlLine(sqlLine)
+          heroes.push(hero)
+        } else {
+          const indexF = heroes[indexH].fights.findIndex(a => a.idFight === sqlLine.idFight)
+
+          if (indexF === -1) heroes[indexH].addFightFromSqlLine(sqlLine)
+          else heroes[indexH].fights[indexF].addTurnFromSqlLine(sqlLine)
         }
-      } else {
-        throw new Error('No cookie find.')
       }
-    } catch (error) {
-      console.error(error)
-      return this.login.responseToClient({ statusCode: 400, returnedDatas: 'Bad request : An error occured during process. Please try logout and login again.' })
     }
+    return heroes
   }
 
   async createUpdateHero (userId, hero) {
-    const newHero = { idHero: hero.idHero === null ? createUUID() : hero.idHero, idUser: userId }
-    await this.database.setHero(Object.assign(hero, newHero))
-    return this.login.responseToClient({ statusCode: 200, returnedDatas: { idHero: newHero.idHero } })
+    const newHero = Hero.create(hero)
+    newHero.update({ 
+      idHero: hero.idHero === null ? createUUID() : hero.idHero, 
+      idUser: userId 
+    })
+    await this.database.setHero(newHero)
+    return { statusCode: 200, returnedDatas: { idHero: newHero.idHero } }
   }
 
   async removeHero (hero) {
     await this.database.removeHero(hero.idHero)
-    return this.login.responseToClient({ statusCode: 200 })
+    return { statusCode: 200 }
   }
 
   async startFight (userId, hero) {
     const opponent = await this.database.getOpponent({ idUser: userId, rankLvl: hero.rankLvl })
 
     if (opponent[0] !== undefined) {
-      const result = this.fightReport(hero, opponent[0])
-      const newFight = await this.database.setFight({
-        idFight: createUUID(),
-        idHero: hero.idHero,
-        opponentName: opponent[0].firstName,
-        result: result.winner === hero.idHero ? 1 : 0,
-        report: result.report
-      })
-      if (result.winner === hero.idHero) {
-        hero.rankLvl += 1
-        hero.skillPoint += 1
-      }
-      else {
-        hero.rankLvl = hero.rankLvl === 1 ? 1 : hero.rankLvl - 1
-      }
-      hero.idUser = userId
-
-      await this.database.setHero(hero)
-      if (newFight[0] !== undefined) return this.login.responseToClient({ statusCode: 200, returnedDatas: { fight: newFight[0], heroUpdate: hero, opponent: opponent[0] } })
+      let heroObject = Hero.create({ ...hero, idUser: userId }).startFight(opponent[0])
+      return { statusCode: 200, returnedDatas: heroObject }
     }
-    return this.login.responseToClient({ statusCode: 400, returnedDatas: 'Sorry... it seems that there is no hero to fight with you.' })
-  }
-
-  fightReport (heroA, heroB) {
-    let report = ''
-    let turn = 1
-    let winner = null
-    let healthA = heroA.health
-    let healthB = heroB.health
-
-    while (healthA > 0 && healthB > 0) {
-      report += `<div class="turn">Turn n°${turn} : </div>`
-
-      let result = this.turn(heroA, heroB)
-      report += result.report
-      healthB = healthB - result.loosedHealth
-
-      result = this.turn(heroB, heroA)
-      report += result.report
-      healthA = healthA - result.loosedHealth
-
-      turn++
-    }
-    
-    if (healthB <= 0) {
-      report += `<br><br><span class="result">YOU WIN ! </span><br>`
-      winner = heroA
-    } else {
-      report += `<br><br><span class="result">YOU LOOSE... </span><br>`
-      winner = heroB
-    }
-
-    return { report: report, winner: winner.idHero }
-  }
-
-  turn (heroA, heroB) {
-    const result = this.attack(heroA.attack, heroA.magik, heroB.defense)
-    if (result === null) {
-      return { report: `${heroA.firstName} <span class="missed">missed attack</span>.<br>`, loosedHealth: 0 }
-    } else {
-      const report = `${heroA.firstName} attack with <span class="point">${result.atkA}</span>.<br>${heroB.firstName} loosed <span class="point">${result.effectiveAttack}</span> life point(s).<br><br>`
-      return { report: report, loosedHealth: result.effectiveAttack }
-    }
-  }
-
-  attack (attackA, magikA, defenseB) {
-    let effectiveAttack = 0
-
-    const atkA = attackA !== 0 ? this.getRandomIntInclusive(1, attackA) : 0
-    if (atkA === 0) return null
-
-    effectiveAttack = atkA - defenseB
-
-    if (effectiveAttack < 0) return null
-    else if (magikA === effectiveAttack) effectiveAttack += magikA
-
-    return { atkA: atkA, effectiveAttack: effectiveAttack }
-  }
-
-  getRandomIntInclusive (min, max) {
-    min = Math.ceil(min)
-    max = Math.floor(max)
-    return Math.floor(Math.random() * (max - min + 1)) + min
+    return { statusCode: 400, returnedDatas: 'Sorry... it seems that there is no hero to fight with you.' }
   }
 }
 

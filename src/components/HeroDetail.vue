@@ -49,7 +49,7 @@
 
         <div v-if="p_type === $env.EDITION" class="heroCategories">          
           <span class="heroCategoriesName">Fights :</span> 
-          <FightList :p_fights="p_hero.fights"></FightList>
+          <FightList :p_heroName="p_hero.firstName" :p_fights="p_hero.fights"></FightList>
         </div>
 
       </form>

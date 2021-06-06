@@ -23,9 +23,9 @@
     </header>
 
     <div class="content">
+      <span class="error left">{{ errorMsg }}</span>
       <div class="loginDiv center flex fd-col" v-if="!isLogged">
         <form @submit.prevent="login" class="flex fd-col">
-          <span class="error left">{{ errorMsg }}</span>
           
           <label for="email" class="notDisplayed">Email</label>
           <input type="email" class="formInput border-bl" id="email" v-model="form.email" placeholder="Email" required />        
@@ -95,6 +95,7 @@ export default {
         attack: 0,
         defense: 0,
         magik: 0,
+        fights: []
       },
       displayScreen: null
     }
@@ -249,7 +250,7 @@ input {
 }
 
 .title {
-  padding: 1rem 0;
+  padding: 1rem;
   font-family: "Gameplay";
   font-size: 1.8rem;
   border: var(--main-white-color) 3px dashed;

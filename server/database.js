@@ -52,15 +52,17 @@ class Database {
   }
 
   getHerosByUser (idUser) {
-    return this.executeQuery(`SELECT h.*, f.idFight, f.opponentName, f.result, f.dateFight, f.report FROM Hero as h LEFT JOIN Fight as f ON h.idHero = f.idHero 
-    WHERE h.idUser = ? ORDER BY h.idHero, f.dateFight DESC`
-    , [idUser])
+    return this.executeQuery(`SELECT h.*, f.opponentName, f.result, f.dateFight, t.* FROM Hero as h 
+    LEFT JOIN Fight as f ON h.idHero = f.idHero 
+    LEFT JOIN Turn as t ON f.idFight = t.idFight
+    WHERE h.idUser = ? ORDER BY h.idHero, f.dateFight DESC, t.turnNumber ASC`
+      , [idUser])
   }
 
   /**
     * 1 - take the closest opponent based on rank value
     * 2 - opponent has to be free (it must not have fight in the past hour)
-    * 3 - take the opponent with the less number of fight with the character
+    * 3 - take the opponent with the less number of fights
     * 4 - take a random opponent within the list
     * @param {*} cred
     * @returns
@@ -73,7 +75,7 @@ class Database {
   FROM Hero as h
   WHERE h.idUser != :idUser
   AND NOT EXISTS ( SELECT dateFight FROM Fight as f WHERE h.idHero = f.idHero AND f.dateFight > DATE_ADD(NOW(), INTERVAL -1 HOUR) ORDER BY dateFight DESC LIMIT 1 )
-  ORDER BY lvlRange, nbFight, RAND() LIMIT 1;`
+  ORDER BY lvlRange, nbFight, RAND() LIMIT 1`
     }, cred)
   }
 
@@ -112,15 +114,25 @@ class Database {
           attack = VALUES(attack), 
           defense = VALUES(defense), 
           magik = VALUES(magik), 
-          idUser = VALUES(idUser)`
+          idUser = VALUES(idUser)
+          RETURNING idHero, firstName, rankLvl, skillPoint, health, attack, defense, magik, idUser`
       }, cred)
   }
 
   setFight (cred) {
     return this.executeQuery({
       namedPlaceholders: true,
-      sql: `INSERT INTO Fight (idFight, idHero, opponentName, result, dateFight, report) VALUES (:idFight, :idHero, :opponentName, :result, NOW(), :report)
-      RETURNING idFight, idHero, opponentName, result, dateFight, report`
+      sql: `INSERT INTO Fight (idFight, idHero, opponentName, result, dateFight) VALUES (:idFight, :idHero, :opponentName, :result, NOW())
+      RETURNING idFight, idHero, opponentName, result, dateFight`
+    }, cred)
+  }
+
+  setTurn (cred) {
+    return this.executeQuery({
+      namedPlaceholders: true,
+      sql: `INSERT INTO Turn (idTurn, turnNumber, attackHeroA, loosedHealthHeroB, attackHeroB, loosedHealthHeroA, idFight) 
+      VALUES (:idTurn, :turnNumber, :attackHeroA, :loosedHealthHeroB, :attackHeroB, :loosedHealthHeroA, :idFight)
+      RETURNING idTurn, turnNumber, attackHeroA, loosedHealthHeroB, attackHeroB, loosedHealthHeroA, idFight`
     }, cred)
   }
 

@@ -10,7 +10,6 @@ const fs = require('fs')
 class Server {
   constructor (conf) {
     this.router = null
-    // this.database = null
     this.conf = conf
 
     const options = {
