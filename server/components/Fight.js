@@ -69,7 +69,7 @@ class Fight {
       }
     }
 
-    this.result = heroB.health <= 0 ? true : false
+    this.result = heroB.health <= 0 ? 1 : 0
     return this
   }
 }

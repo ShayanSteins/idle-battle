@@ -1,29 +1,33 @@
 <template>
   <div>
+    <div class="vsDiv center"><span>{{ p_heroName }}</span> VS <span>{{ p_fight.opponentName }}</span></div>
+
     <div v-for="turn in p_fight.turns" :key="turn.idTurn">
-      <div>Turn n°{{ turn.turnNumber }}</div>
-      <div class="turnA">
+      <div class="turn">Turn n°{{ turn.turnNumber }}</div>
+      <div class="turnA subTurn italic">
         <div v-if="turn.attackHeroA === 0 && turn.loosedHealthHeroB === 0">
-          <div>{{ p_heroName }} missed his attack</div>
+          <div class="missed">{{ p_heroName }} missed his attack</div>
         </div>
         <div v-else>
-          <div>{{ p_heroName }} attacked with {{ turn.attackHeroA }}</div>
-          <div>{{ p_fight.opponentName }} loosed {{ turn.loosedHealthHeroB }} health point(s) </div>
+          <div>{{ p_heroName }} attacked with <span class="green bold">{{ turn.attackHeroA }}</span></div>
+          <div>{{ p_fight.opponentName }} loosed <span class="green bold">{{ turn.loosedHealthHeroB }}</span> health point(s)</div>
         </div>
       </div>
-      <div class="turnB">
+      <div class="turnB subTurn italic">
         <div v-if="turn.attackHeroB === 0 && turn.loosedHealthHeroA === 0">
-          <div>{{ p_fight.opponentName }} missed his attack</div>
+          <div class="missed">{{ p_fight.opponentName }} missed his attack</div>
         </div>
         <div v-else-if="turn.attackHeroB !== null && turn.loosedHealthHeroA !== null ">
-          <div>{{ p_fight.opponentName }} attacked with {{ turn.attackHeroB }}</div>
-          <div>{{ p_heroName }} loosed {{ turn.loosedHealthHeroA }} health point(s) </div>
+          <div>{{ p_fight.opponentName }} attacked with <span class="orange bold">{{ turn.attackHeroB }}</span></div>
+          <div>{{ p_heroName }} loosed <span class="orange bold">{{ turn.loosedHealthHeroA }}</span> health point(s)</div>
         </div>
       </div>
     </div>
 
-    <div v-if="p_fight.result === true">YOU WIN</div>
-    <div v-else>YOU LOOSE</div>
+    <div class="center bold resultFight" :class="p_fight.result ? 'green' : 'orange'">
+      <span v-if="p_fight.result === 1">YOU WIN !</span>
+      <span v-else>YOU LOOSE !</span>
+    </div>
   </div>
 </template>
 
@@ -38,17 +42,30 @@ export default {
 </script>
 
 <style scoped>
-  .reportFight {
-    width: -webkit-fill-available;
-  }
-  .turn {
-    font-weight: bold;
-    display: block;
-    font-size: 1.2rem;
-    margin-top: 1rem;
-  }
-  .point {
-    font-weight: bold;
-    color: var(--main-green-color);
-  }
+.reportFight {
+  width: -webkit-fill-available;
+}
+.vsDiv {
+  font-size: 1.2rem;
+}
+.turn {
+  font-weight: bold;
+  display: block;
+  margin: 1rem 0 0.3rem 0;
+}
+.subTurn {
+  margin-bottom: 0.3rem;
+  margin-left: 1rem;
+}
+.orange {
+  color: var(--main-orange-color);
+}
+.missed {
+  color: var(--main-yellow-color);
+}
+.resultFight {  
+  font-family: "Gameplay";
+  font-size: 1.5rem;
+  margin: 1rem 0;
+}
 </style>

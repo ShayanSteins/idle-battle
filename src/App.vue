@@ -186,7 +186,11 @@ export default {
   --main-grey-color: rgba(88, 88, 88, 1);
   --main-white-color: rgba(236, 236, 236, 1);
   --main-red-color: rgba(255, 36, 36, 1);
-  --main-green-color: rgba(1, 169, 52, 1);
+  --main-green-color: rgba(72, 169, 101, 1);
+  --darker-green-color: rgba(5, 115, 50, 1);
+  --main-orange-color: rgba(255, 147, 95, 1);
+  --darker-orange-color: rgba(139, 47, 2, 1);
+  --main-yellow-color: rgba(255, 198, 95, 1);
 }
 
 @font-face {
@@ -197,7 +201,7 @@ export default {
 html,
 body {
   margin: 0;
-  width: 100vw;
+  /* width: 100vw; */
   font-family: sans-serif;
   font-size: 1rem;
   color: var(--main-white-color);
@@ -206,6 +210,9 @@ body {
 
 .italic {
   font-style: italic;
+}
+.bold {
+  font-weight: bold;
 }
 .small {
   font-size: 0.9rem;

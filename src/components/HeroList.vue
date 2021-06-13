@@ -1,17 +1,22 @@
 <template>
   <div>
     <div class="subTitle center">Heroes list</div>
-    <div class="flex">
+    <!-- <div class="flex"> -->
       <div v-if="p_list.length === 0" class="emptyList center">It seems you don't have any Hero in your pool...</div>
       <div v-else class="heroesContainer flex">
-        <div v-for="hero in p_list" :key="hero.idHero" class="heroContainer center flex fd-col" @click="selectHero(hero)">
-          <span class="heroName">{{ hero.firstName }}</span>
+        <div 
+        v-for="hero in p_list" 
+        :key="hero.idHero" 
+        :class="{ selected: selectedHero && selectedHero.idHero === hero.idHero }" 
+        class="heroContainer center flex fd-col" 
+        @click="selectHero(hero)">
+          <span class="heroName bold">{{ hero.firstName }}</span>
           <span class="small italic">Rank {{ hero.rankLvl }}</span>
         </div>
       </div>
-    </div>
+    <!-- </div> -->
 
-        <div class="center separator">------------------------------------------------</div>
+        <div class="center separator">- - - - - - - - - - - - - - - - - - - - -</div>
     <HeroDetail 
       v-if="selectedHero"
       :p_hero="selectedHero" 
@@ -69,14 +74,14 @@ export default {
   background-color: var(--main-black-color);
   justify-content: center;
   padding: 0.5rem 1rem;
+  margin-bottom: 0.6rem;
   width: calc(45% - 2rem);
   cursor: pointer;
 }
-.heroContainer:hover {
+.heroContainer:hover, .heroContainer.selected {
   filter: invert();
 }
 .heroName {
-  font-weight: bold;
   overflow: hidden;
   text-overflow: ellipsis;
 }

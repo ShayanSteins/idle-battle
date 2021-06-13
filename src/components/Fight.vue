@@ -16,11 +16,11 @@
       <Button p_class="fightBtn" p_value="Fight !" :disabled="!canHeFight" @click="startFight"></Button>
       
       <div v-if="displayFight" class="flex fd-col fa-i-center">
-        <div class="center">------------------------------------------------</div>
+        <div class="center">- - - - - - - - - - - - - - - - - - - - -</div>
 
         <span class="subTitle fightTitle center">FIGHT !</span>
 
-        <div><span class="green">{{ selectedHero.firstName }}</span> VS <span class="error">{{ newFight.opponentName }}</span></div>
+        <!-- <div><span class="green">{{ selectedHero.firstName }}</span> VS <span class="error">{{ newFight.opponentName }}</span></div> -->
 
         <FightWorkflow :p_heroName="selectedHero.firstName" :p_fight="newFight"></FightWorkflow>
 

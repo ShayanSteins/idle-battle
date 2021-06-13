@@ -76,7 +76,7 @@ class Hero {
     fight.dateFight = dbFight.dateFight
     this.fights.push(fight)
 
-    if (fight.result === true) {
+    if (fight.result === 1) {
       this.rankLvl += 1
       this.skillPoint += 1
     }

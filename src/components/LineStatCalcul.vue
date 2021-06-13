@@ -2,7 +2,7 @@
   <div class="variables">
     <Button p_type="button" p_class="smallBtn" p_value="-" @click="calculStat('less')"></Button>
     <!-- <input type="button" @click="calculStat('less')" value="-" /> -->
-    <span class="green statVal">{{ newStatValue }}</span>
+    <span class="green statVal bold">{{ newStatValue }}</span>
     <Button p_type="button" p_class="smallBtn" p_value="+" :disabled="p_maxReached" @click="calculStat('more')"></Button>
     <!-- <input type="button" @click="calculStat('more')" value="+" :disabled="p_maxReached" /> -->
     <span>(+{{ usedSkillPoint }})</span>
@@ -64,6 +64,6 @@ export default {
   align-items: center;
 }
 .statVal {
-  font-weight: bold;
+  /* font-weight: bold; */
 }
 </style>

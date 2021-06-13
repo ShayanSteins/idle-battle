@@ -8,8 +8,8 @@
       <div v-if="maxExceeded" class="error">You spent too much skill point, please adjust your repartition.</div>
       <form @submit.prevent="createUpdate" class="flex fd-col">
         <div class="flex fa-i-center fj-c-between heroCategories">
-          <div class="flex f-grow"> 
-            <label for="heroName" class="heroCategoriesName">Name : </label>
+          <div class="flex f-grow fa-i-center"> 
+            <label for="heroName" class="heroCategoriesName bold">Name : </label>
             <label v-if="p_type === $env.EDITION">{{ p_hero.firstName }}</label>
             <input v-else type="text" minlength="2" maxlength="30" class="inputHeroName f-grow border-bl" id="heroName" v-model="newHero.firstName" required />          
           </div>
@@ -21,7 +21,7 @@
         <br />
 
         <div class="flex fj-c-between fa-i-center heroCategories">
-          <span class="heroCategoriesName">Stats :</span>
+          <span class="heroCategoriesName bold">Stats :</span>
           <span v-if="p_type === $env.EDITION">Rank : {{ p_hero.rankLvl }}</span>
           
         </div>
@@ -48,9 +48,9 @@
         </div>
 
         <div v-if="p_type === $env.EDITION" class="heroCategories">          
-          <span class="heroCategoriesName">Fights :</span> 
-          <FightList :p_heroName="p_hero.firstName" :p_fights="p_hero.fights"></FightList>
+          <span class="heroCategoriesName bold">Fights :</span> 
         </div>
+          <FightList :p_heroName="p_hero.firstName" :p_fights="p_hero.fights"></FightList>
 
       </form>
     </div>
@@ -189,10 +189,9 @@ export default {
   margin-left: 0.5rem;
 }
 .heroCategories {
-  margin-top: 0.5rem;
+  margin: 0.5rem 0;
 }
 .heroCategoriesName {
-  font-weight: bold;
   font-size: 1.1rem;
   padding-right: 0.4rem;
 }
