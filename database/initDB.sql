@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS Fight (
   opponentName VARCHAR(30) NOT NULL,
   result SMALLINT(1) NOT NULL,
   dateFight DATETIME NOT NULL,
-  FOREIGN KEY(idHero) REFERENCES Hero(idHero),
+  FOREIGN KEY(idHero) REFERENCES Hero(idHero) ON DELETE CASCADE,
   PRIMARY KEY (idFight)
 );
 
@@ -45,6 +45,6 @@ CREATE TABLE IF NOT EXISTS Turn (
   attackHeroB TINYINT(255) UNSIGNED,
   loosedHealthHeroA TINYINT(255) UNSIGNED,
   idFight CHAR(36) NOT NULL,
-  FOREIGN KEY(idFight) REFERENCES Fight(idFight),
+  FOREIGN KEY(idFight) REFERENCES Fight(idFight) ON DELETE CASCADE,
   PRIMARY KEY (idTurn)
 );

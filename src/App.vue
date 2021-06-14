@@ -253,6 +253,10 @@ body {
   color: var(--main-green-color);
 }
 
+.separator {
+  margin: 1rem;
+}
+
 input {
   background-color: var(--main-black-color);
   color: var(--main-white-color);

@@ -61,10 +61,6 @@ export default {
   margin: auto;
 }
 
-.separator {
-  margin: 1rem;
-}
-
 .heroesContainer {
   flex-wrap: wrap;
   justify-content: space-evenly;

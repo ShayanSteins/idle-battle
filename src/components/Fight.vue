@@ -16,7 +16,7 @@
       <Button p_class="fightBtn" p_value="Fight !" :disabled="!canHeFight" @click="startFight"></Button>
       
       <div v-if="displayFight" class="flex fd-col fa-i-center">
-        <div class="center">- - - - - - - - - - - - - - - - - - - - -</div>
+        <div class="center separator">- - - - - - - - - - - - - - - - - - - - -</div>
 
         <span class="subTitle fightTitle center">FIGHT !</span>
 
