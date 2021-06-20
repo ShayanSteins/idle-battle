@@ -39,6 +39,9 @@ export default {
   padding: 0.4rem;
   margin: 0;
 }
+.withText img {
+  margin-right: 0.6rem;
+}
 
 @media screen and (min-width: 600px) {
   .withText img {

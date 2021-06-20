@@ -7,12 +7,13 @@
     </div>
     <div v-else>
       <div class="selectHeroLabel">Choose your hero :</div>
-      <select class="selectHero" v-model="selectedHero">
+      <select class="selectHero" v-model="selectedHero" @change="initDisplayFight">
         <option disabled value="">Choose...</option>
         <option v-for="hero in availableHeros" :key="hero.idHero" :value="hero">
           {{ hero.firstName }}
         </option>
       </select>
+      <span class="infoFight italic tinny">Only heroes that have not loosed a fight in the past hour and have at least one attack point will be on the list.</span>
       <Button p_class="fightBtn" p_value="Fight !" :disabled="!canHeFight" @click="startFight"></Button>
       
       <div v-if="displayFight" class="flex fd-col fa-i-center">
@@ -20,9 +21,7 @@
 
         <span class="subTitle fightTitle center">FIGHT !</span>
 
-        <!-- <div><span class="green">{{ selectedHero.firstName }}</span> VS <span class="error">{{ newFight.opponentName }}</span></div> -->
-
-        <FightWorkflow :p_heroName="selectedHero.firstName" :p_fight="newFight"></FightWorkflow>
+        <FightWorkflow :p_heroName="selectedHeroName" :p_fight="newFight"></FightWorkflow>
 
         <Button p_value="Next fight" v-if="canHeFight" @click="startFight"></Button>
 
@@ -41,6 +40,7 @@ export default {
   data () {
     return {
       selectedHero: '',
+      selectedHeroName: '',
       displayFight: false,
       newFight: null,
       errorMsg: ''
@@ -54,7 +54,7 @@ export default {
   },
   computed: {
     availableHeros: function () {
-      let avHero = []
+      let availableHeroes = []
       for (const hero of this.p_list) {
         if (hero.attack > 0) {
           if (hero.fights.length > 0) {
@@ -63,20 +63,21 @@ export default {
             nowLessOneHour.setHours(nowLessOneHour.getHours() - 1)
             if (new Date(latestFight.dateFight) > nowLessOneHour && !latestFight.result) continue
           }
-          avHero.push(hero)
+          availableHeroes.push(hero)
         }
       }
-      return avHero
+      return availableHeroes
     },
     canHeFight () {
       if(this.selectedHero === '') return false
-      else if(this.newFight !== null && this.newFight.result === false) return false
+      else if(this.newFight !== null && this.newFight.result === 0) return false
       return true
     }
   },
   methods: {
     async startFight () {
       try {
+        console.log(this.selectedHero)
         const response = await fetch('/start-fight', {
           method: 'POST',
           credentials: 'same-origin',
@@ -88,13 +89,24 @@ export default {
         }
 
         this.newFight = datas.fights[datas.fights.length - 1]
+        this.selectedHeroName = this.selectedHero.firstName
         this.$emit('updateHero', datas)
+
+        if (this.newFight.result === 0) {
+          this.selectedHero = ''
+        }
+
         this.errorMsg = ''
         this.displayFight = true
 
       } catch (error) {
         this.errorMsg = error
       }
+    },
+    initDisplayFight() {
+      this.displayFight = false
+      this.newFight = null
+      this.selectedHeroName = null
     }
   }
 }
@@ -109,8 +121,11 @@ export default {
 }
 .selectHero {
   padding: 0.4rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.3rem;
   width: 100%;
+}
+.infoFight {
+  color: var(--darker-white-color);
 }
 .fightBtn {
   width: 100%;

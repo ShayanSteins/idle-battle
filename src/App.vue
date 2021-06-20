@@ -185,6 +185,7 @@ export default {
   --main-black-color: rgba(36, 36, 36, 1);
   --main-grey-color: rgba(88, 88, 88, 1);
   --main-white-color: rgba(236, 236, 236, 1);
+  --darker-white-color: rgba(170, 170, 170, 1);
   --main-red-color: rgba(255, 36, 36, 1);
   --main-green-color: rgba(72, 169, 101, 1);
   --darker-green-color: rgba(5, 115, 50, 1);
@@ -213,6 +214,9 @@ body {
 }
 .bold {
   font-weight: bold;
+}
+.tinny {
+  font-size: 0.8rem;
 }
 .small {
   font-size: 0.9rem;

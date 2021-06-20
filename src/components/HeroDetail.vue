@@ -20,7 +20,7 @@
         </div>
         <br />
 
-        <div class="flex fj-c-between fa-i-center heroCategories">
+        <div class="heroCategories flex fj-c-between fa-i-center">
           <span class="heroCategoriesName bold">Stats :</span>
           <span v-if="p_type === $env.EDITION">Rank : {{ p_hero.rankLvl }}</span>
           
@@ -49,8 +49,8 @@
 
         <div v-if="p_type === $env.EDITION" class="heroCategories">          
           <span class="heroCategoriesName bold">Fights :</span> 
-        </div>
           <FightList :p_heroName="p_hero.firstName" :p_fights="p_hero.fights"></FightList>
+        </div>
 
       </form>
     </div>

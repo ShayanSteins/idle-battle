@@ -43,6 +43,9 @@ button:disabled {
   height: 30px;
   font-weight: bold;
 }
+.fightBtn {
+  margin-top: 1rem;
+}
 
 @media screen and (min-width: 600px) {
   .bigBtn {
