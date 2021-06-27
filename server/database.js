@@ -1,8 +1,9 @@
 const mariadb = require('mariadb')
+const { env } = require('./assets/utils.js')
 
 /**
- * Gestionnaire de base de données
- * @property {mariadb.Pool} : Pool de connexion à la DB
+ * Database manager, singleton
+ * @property {mariadb.Pool} : Pool connexion for DB
  */
 class Database {
   constructor (config) {
@@ -20,6 +21,11 @@ class Database {
     return this
   }
 
+  /**
+   * Get the instance of DB manager
+   * @param {Object} config 
+   * @returns {Database|Error}
+   */
   static getInstance (config) {
     if (Database.instance instanceof Database) return Database.instance
     else if (config !== null) return new Database(config)
@@ -27,30 +33,45 @@ class Database {
   }
 
   /**
-   * Teste la connexion à la DB via une requête simple
+   * Test DB connection via simple request
    */
   async testConnection () {
     await this.pool.query('SELECT version()')
   }
 
   /**
-   * Fonction d'exécution des requêtes
-   * @param {String} query : requête paramétrée à exécuter
-   * @param {Array[Array]|Array|null} params : paramètres à inclure dans la requête
+   * Request excutive function
+   * @param {String} query : parameter query to execute
+   * @param {Array<Array>|Array|null} params : prepared statements
    */
   async executeQuery (query, params) {
     if (Array.isArray(params) && Array.isArray(params[0])) return await this.pool.batch(query, params)
     else return await this.pool.query(query, params)
   }
 
+  /**
+   * Get the user by Id
+   * @param {String} idUser 
+   * @returns {Object}
+   */
   getUserById (idUser) {
     return this.executeQuery('SELECT * FROM User WHERE idUser = ?', [idUser])
   }
 
+  /**
+   * Get the user by Email
+   * @param {String} idUser 
+   * @returns {Object}
+   */
   getUserByEmail (email) {
     return this.executeQuery('SELECT * FROM User WHERE email = ?', [email])
   }
 
+  /**
+   * Get heroes by id user
+   * @param {String} idUser 
+   * @returns {Object}
+   */
   getHerosByUser (idUser) {
     return this.executeQuery(`SELECT h.*, f.opponentName, f.result, f.dateFight, t.* FROM Hero as h 
     LEFT JOIN Fight as f ON h.idHero = f.idHero 
@@ -60,16 +81,17 @@ class Database {
   }
 
   /**
-    * 1 - take the closest opponent based on rank value
+    * 1 - take the closest opponents based on rank value
     * 2 - opponent has to be free (it must not have fight in the past hour)
-    * 3 - take the opponent with the less number of fights
+    * 3 - take the opponents with the less number of fights
     * 4 - take a random opponent within the list
-    * @param {*} cred
-    * @returns
+    * @param {Object} cred {idUser: String, rankLvl: Integer}
+    * @returns {Object}
     */
   getOpponent (cred) {
     return this.executeQuery({
-      namedPlaceholders: true, sql: `SELECT h.idHero, h.firstName, h.rankLvl, h.skillPoint, h.health, h.attack, h.defense, h.magik, 
+      namedPlaceholders: true, 
+      sql: `SELECT h.idHero, h.firstName, h.rankLvl, h.skillPoint, h.health, h.attack, h.defense, h.magik, 
     ABS(:rankLvl - cast(h.rankLvl as signed)) as lvlRange,
     (SELECT count(*) FROM Fight WHERE idHero = h.idHero) as nbFight
   FROM Hero as h
@@ -80,24 +102,27 @@ class Database {
   }
 
   /**
-   * @param {Object} cred {id: idUser, type: typeUser}
-   * @returns
+   * Add gitHub account
+   * @param {Object} cred {id: idUser}
+   * @returns {Object}
    */
   setGitHubCredentials (cred) {
-    return this.executeQuery({ namedPlaceholders: true, sql: 'INSERT INTO User (idUser, typeUser) VALUES (:id, :type)' }, cred)
+    return this.executeQuery({ namedPlaceholders: true, sql: `INSERT INTO User (idUser, typeUser) VALUES (:id, ${env.ID_AUTH})` }, cred)
   }
 
   /**
-   * @param {Object} cred {id:idUser, type:typeUser, email:email, hash:hashedPassword, salt:salt}
-   * @returns
+   * Add classic account
+   * @param {Object} cred {id:idUser, email:email, hash:hashedPassword, salt:salt}
+   * @returns {Object}
    */
   setClassicCredentials (cred) {
-    return this.executeQuery({ namedPlaceholders: true, sql: 'INSERT INTO User (idUser, typeUser, email, hashedPassword, salt) VALUES (:id, :type, :email, :hash, :salt)' }, cred)
+    return this.executeQuery({ namedPlaceholders: true, sql: `INSERT INTO User (idUser, typeUser, email, hashedPassword, salt) VALUES (:id, ${env.GITHUB_AUTH}, :email, :hash, :salt)` }, cred)
   }
 
   /**
+   * Add or Update Hero
    * @param {Object} cred { idHero:idHero, firstName:firstName, rankLvl:rankLvl, skillPoint:skillPoint, health:health, attack:attack, defense:defense, magik:magik, idUser: idUser }
-   * @returns
+   * @returns {Object}
    */
   setHero (cred) {
     return this.executeQuery(
@@ -119,6 +144,11 @@ class Database {
       }, cred)
   }
 
+  /**
+   * Add or Update Fight
+   * @param {Object} cred { idFight:idFight, idHero:idHero, opponentName:opponentName, result:result }
+   * @returns {Object}
+   */
   setFight (cred) {
     return this.executeQuery({
       namedPlaceholders: true,
@@ -127,6 +157,11 @@ class Database {
     }, cred)
   }
 
+  /**
+   * Add or Update Turn
+   * @param {Object} cred { idTurn:idTurn, turnNumber:turnNumber, attackHeroA:attackHeroA, loosedHealthHeroB:loosedHealthHeroB, attackHeroB:attackHeroB, loosedHealthHeroA:loosedHealthHeroA, idFight:idFight }
+   * @returns {Object}
+   */
   setTurn (cred) {
     return this.executeQuery({
       namedPlaceholders: true,
@@ -136,6 +171,11 @@ class Database {
     }, cred)
   }
 
+  /**
+   * Remove a Hero and all his related datas (Fight and Turn)
+   * @param {String} idHero 
+   * @returns {Object}
+   */
   removeHero (idHero) {
     return this.executeQuery('DELETE FROM Hero where idHero = ?', [idHero])
   }

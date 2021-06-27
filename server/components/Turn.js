@@ -1,7 +1,15 @@
 const { createUUID } = require("../assets/utils.js");
 const Database = require('../database.js')
 
-
+/**
+ * Turn entity
+ * @property {String} idTurn;
+ * @property {Integer} turnNumber;
+ * @property {Integer} attackHeroA;
+ * @property {Integer} loosedHealthHeroB;
+ * @property {Integer} attackHeroB;
+ * @property {Integer} loosedHealthHeroA;
+ */
 class Turn {
   idTurn;
   turnNumber = 1;
@@ -10,6 +18,10 @@ class Turn {
   attackHeroB = 0;
   loosedHealthHeroA = 0;
 
+  /**
+   * Constructor, mainly used to instanciate a Turn with db datas
+   * @param {idTurn: String, turnNumber: Integer, attackHeroA: Integer, loosedHealthHeroB: Integer, attackHeroB: Integer, loosedHealthHeroA: Integer} 
+   */
   constructor ({ idTurn, turnNumber, attackHeroA, loosedHealthHeroB, attackHeroB, loosedHealthHeroA }) {
     this.idTurn = idTurn
     this.turnNumber = turnNumber
@@ -19,12 +31,21 @@ class Turn {
     this.loosedHealthHeroA = loosedHealthHeroA ?? this.loosedHealthHeroA
   }
 
+  /**
+   * Create a Turn with datas coming via the front
+   * @param { turnNumber: Integer, attackHeroA: Integer, loosedHealthHeroB: Integer, attackHeroB: Integer, loosedHealthHeroA: Integer} 
+   * @returns {Turn}
+   */
   static create ({ turnNumber, attackHeroA, loosedHealthHeroB, attackHeroB, loosedHealthHeroA }) {
-    if (turnNumber !== undefined && attackHeroA !== undefined && loosedHealthHeroB !== undefined && attackHeroB !== undefined && loosedHealthHeroA !== undefined) {
+    if (turnNumber !== undefined && attackHeroA !== undefined && loosedHealthHeroB !== undefined && attackHeroB !== undefined && loosedHealthHeroA !== undefined)
       return new Turn({ idTurn: createUUID(), turnNumber, attackHeroA, loosedHealthHeroB, attackHeroB, loosedHealthHeroA })
-    }
   }
 
+  /**
+   * Update the Turn
+   * @param {Object|Hero} properties 
+   * @returns {Turn}
+   */
   update (properties) {
     for (const key in properties) {
       this[key] = properties[key]
@@ -32,7 +53,10 @@ class Turn {
     return this
   }
 
-
+  /**
+   * Add the Turn in DB
+   * @return {Turn|Error}
+   */
   async saveInDb (idFight) {
     const savedTurn = await Database.getInstance().setTurn({
       idTurn: this.idTurn,
@@ -48,6 +72,12 @@ class Turn {
     return this
   }
 
+  /**
+   * Launch attacks for both hero
+   * @param {Hero} heroA : user Hero
+   * @param {Hero} heroB  : opponent Hero
+   * @returns {Turn}
+   */
   attack (heroA, heroB) {
     let result = this.attackCalculation(heroA, heroB)
     this.attackHeroA = result.attack
@@ -68,6 +98,12 @@ class Turn {
     return this
   }
 
+  /**
+   * Calculate attack and loosedHealth
+   * @param {Hero} attacker 
+   * @param {Hero} defender 
+   * @returns {attack: Integer, loosedHealth: Integer}
+   */
   attackCalculation (attacker, defender) {
     let effectiveAttack = 0
 
@@ -82,6 +118,12 @@ class Turn {
     return { attack: atkA, loosedHealth: effectiveAttack }
   }
 
+  /**
+   * Dice launch
+   * @param {Integer} min 
+   * @param {Integer} max 
+   * @returns {Integer} dice launch value
+   */
   getRandomIntInclusive (min, max) {
     min = Math.ceil(min)
     max = Math.floor(max)

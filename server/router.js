@@ -2,9 +2,8 @@ const fs = require('fs')
 const { env } = require('./assets/utils.js')
 const DatasManager = require('./datasManager')
 const Login = require('./login')
-// const https = require('https')
 
-// Types MIME
+// MIME Types
 const mimeType = {
   css: 'text/css',
   js: 'application/javascript',
@@ -19,8 +18,9 @@ const mimeType = {
 }
 
 /**
- * Routeur web
- * @property {String} distPath : chemin d'accès au dossier dist (parcel)
+ * Web router
+ * @property {Object} conf : router configuration
+ * @property {String} distPath : path to dist folder (parcel)
  */
 class Router {
   constructor (config) {
@@ -29,16 +29,15 @@ class Router {
   }
 
   /**
-   * Gestionnaire de routes et requêtes HTTP
-   * @param {Request} req : requête à router
-   * @param {Response} res : réponse reçue
+   * HTTPS route and request manager
+   * @param {Request} req : resquest to route
+   * @param {Response} res : received response
    */
   async handle (req, res) {
     const url = new URL(req.url, `https://${req.headers.host}`)
     const fileName = url.pathname === '/' ? 'index.html' : url.pathname
     const extension = fileName.split('.')[fileName.split('.').length - 1]
     const login = new Login()
-    console.log(fileName)
 
     if (req.method === 'GET') {
       if (fileName === '/github-login') {
@@ -72,7 +71,7 @@ class Router {
       } else if (!fs.existsSync(this.distPath + fileName)) { // Erreur 404
         res.writeHead(404, { 'Content-Type': 'text/html' })
         res.end(`<html><body style="display: flex;background-color:  rgb(248, 248, 248);color: rgb(208 44 55);font-size: 2rem;justify-content: center;align-items: center;text-align: center;font-family: monospace;"><h2>Error 404 : File "${this.distPath + fileName}" not found... (&deg;o&deg;)!</h2></body></html>`)
-      } else { // Cas nominal des fichiers html, js, css, images
+      } else { // html, js, css, images files
         res.writeHead(200, { 'Content-Type': mimeType[extension] })
         res.end(fs.readFileSync(this.distPath + fileName))
       }
@@ -108,6 +107,7 @@ class Router {
   }
 
   /**
+   * Construct the response for client with status code, datas, headers and cookie
    * @param {Object} params : {statusCode, returnedDatas, headers, cookie}
    */
   static responseToClient (response, params) {
@@ -119,11 +119,18 @@ class Router {
     else response.end()
   }
 
+  /**
+   * Checking for auth cookies
+   * @param {Request} request 
+   * @param {Response} response 
+   * @param {Login} login 
+   * @returns {Object}
+   */
   async checkCookieBefore (request, response, login) {
     try {
       if (request.headers.cookie) {
         const userId = request.headers.cookie.split(';').find(a => a.includes('userId=')).split('=')[1]
-        const user = await login.doesUserDbExist(userId, env.ID_AUTH)
+        const user = await login.getUserDbIfExist(userId, env.ID_AUTH)
         if (user !== undefined) {
           let concatedDatas = Buffer.alloc(0)
           request.on('data', datas => {

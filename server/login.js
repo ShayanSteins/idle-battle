@@ -3,11 +3,23 @@ const { resolve } = require('path')
 const { env } = require('./assets/utils.js')
 const Database = require('./database.js')
 
+/**
+ * Login class
+ * @property {Database} database : Database intance
+ */
 class Login {
   constructor () {
     this.database = Database.getInstance()
   }
 
+  /**
+   * Manage GitHub authentification
+   * @param {Object} conf : OAuthKeysPath configuration
+   * @param {Boolean} firstStage : first stage true, second stage false
+   * @param {URL} url 
+   * @param {String} host 
+   * @returns 
+   */
   githubAuth (conf, firstStage = true, url = null, host = null) {
     const { clientId, clientSecret } = require(conf.OAuthKeysPath)
 
@@ -39,13 +51,9 @@ class Login {
             try {
               datas = JSON.parse(datas.toString())
               const userId = await this.checkGithubToken(datas.access_token)
+              let user = await this.getUserDbIfExist(userId, env.ID_AUTH)
 
-              let user = await this.doesUserDbExist(userId, env.ID_AUTH)
-
-              if (user === undefined) {
-                user = { idUser: userId, typeUser: env.ID_AUTH }
-                await this.database.setGitHubCredentials({ id: userId, type: env.ID_AUTH })
-              }
+              if (user === undefined) await this.database.setGitHubCredentials({ id: userId })
               resolve({ statusCode: 301, cookie: [`token=${datas.access_token}; secure; HttpOnly`, `userId=${userId}; secure; HttpOnly`, 'logged=true'], headers: { Location: `https://${host}/` } })
             } catch (error) {
               console.error(error)
@@ -61,13 +69,18 @@ class Login {
     }
   }
 
+  /**
+   * Manage classic authentification
+   * @param {Request.headers} headers 
+   * @returns {Object}
+   */
   async loginUser (headers) {
     if (headers.authorization !== undefined && headers.authorization !== '') {
       const credentials = Buffer.from(headers.authorization.split(' ')[1], 'base64').toString('utf8')
       const [email, pwd, type] = credentials.split(':')
 
       try {
-        const exist = await this.doesUserDbExist(email, env.EMAIL_AUTH)
+        const exist = await this.getUserDbIfExist(email, env.EMAIL_AUTH)
         const { hasher, createUUID, compare } = require('./assets/utils.js')
 
         if (type === 'register') { // Type register
@@ -75,7 +88,7 @@ class Login {
             const cred = hasher(pwd)
             const newIdUser = createUUID()
             try {
-              await this.database.setClassicCredentials({ id: newIdUser, type: env.EMAIL_AUTH, email: email, hash: cred.hashedPassword, salt: cred.salt })
+              await this.database.setClassicCredentials({ id: newIdUser, email: email, hash: cred.hashedPassword, salt: cred.salt })
               return {
                 statusCode: 200,
                 cookie: [`userId=${newIdUser}; secure; HttpOnly`, 'logged=true']
@@ -113,6 +126,11 @@ class Login {
     return { statusCode: 400, returnedDatas: 'Bad request : An error occured during authentification. Please try again.' }
   }
 
+  /**
+   * Log out te user and reset cookies
+   * @param {Request.headers.cookie} cookies 
+   * @returns {Object}
+   */
   logout (cookies) {
     try {
       const expireCookies = []
@@ -132,6 +150,11 @@ class Login {
     }
   }
 
+  /**
+   * Check GitHub token
+   * @param {String} token 
+   * @returns {String} user id
+   */
   checkGithubToken (token) {
     const opt = {
       port: 443,
@@ -160,7 +183,13 @@ class Login {
     })
   }
 
-  async doesUserDbExist (id, type) {
+  /**
+   * Get a user if he exist on DB, if not, return undefined
+   * @param {String} id 
+   * @param {Integer} type 
+   * @returns {Obect|undefined}
+   */
+  async getUserDbIfExist (id, type) {
     let dbCred = []
 
     if (type === env.ID_AUTH) {

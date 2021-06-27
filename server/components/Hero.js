@@ -2,6 +2,19 @@ const { createUUID } = require("../assets/utils.js");
 const Database = require('../database.js')
 const Fight = require("./Fight.js");
 
+/**
+ * Hero entity
+ * @property {String} idHero;
+ * @property {String} firstName;
+ * @property {Integer} rankLvl;
+ * @property {Integer} skillPoint;
+ * @property {Integer} health;
+ * @property {Integer} attack;
+ * @property {Integer} defense;
+ * @property {Integer} magik;
+ * @property {String} idUser;
+ * @property {Array<Fight>} fights; *
+ */
 class Hero {
   idHero;
   firstName;
@@ -14,6 +27,10 @@ class Hero {
   idUser;
   fights = [];
 
+  /**
+   * Constructor, mainly used to instanciate a Hero with db datas
+   * @param {idHero: String, firstName: String, rankLvl: Integer, skillPoint: Integer, health: Integer, attack: Integer, defense: Integer, magik: Integer, fights: Array<Fight>, idUser: String}
+   */
   constructor ({ idHero, firstName, rankLvl, skillPoint, health, attack, defense, magik, fights, idUser }) {
     this.idHero = idHero
     this.firstName = firstName
@@ -27,6 +44,11 @@ class Hero {
     this.idUser = idUser
   }
 
+  /**
+   * Create a Hero with datas coming via the front
+   * @param {idHero: String, firstName: String, rankLvl: Integer, skillPoint: Integer, health: Integer, attack: Integer, defense: Integer, magik: Integer, fights: Array<Fight>, idUser: String} 
+   * @returns {Hero|null}
+   */
   static create ({ idHero, firstName, rankLvl, skillPoint, health, attack, defense, magik, fights, idUser }) {
     if (firstName !== undefined && rankLvl !== undefined && skillPoint !== undefined && health !== undefined && attack !== undefined && defense !== undefined && magik !== undefined) {
       return new Hero({ 
@@ -45,6 +67,11 @@ class Hero {
     return null
   }
 
+  /**
+   * Update the hero
+   * @param {Object|Hero} properties 
+   * @returns {Hero}
+   */
   update (properties) {
     for (const key in properties) {
       this[key] = properties[key]
@@ -52,12 +79,21 @@ class Hero {
     return this
   }
 
+  /**
+   * Add the Hero in DB
+   * @returns {Hero|Error} the hero saved
+   */
   async saveInDb () {
     const savedHero = await Database.getInstance().setHero(this)    
     if (savedHero[0] === undefined) throw { statusCode: 400, returnedDatas: 'Bad request : DB Hero insertion failed.' }
     return this
   }
 
+  /**
+   * Add a Fight to the Hero with a SQL Line result
+   * @param {Object} sqlLine 
+   * @returns {Hero}
+   */
   addFightFromSqlLine (sqlLine) {
     this.fights.push(
       new Fight({
@@ -70,6 +106,11 @@ class Hero {
     return this
   }
 
+  /**
+   * Start a new fight
+   * @param {Hero} opponent 
+   * @returns {Hero}
+   */
   async startFight (opponent) {
     const fight = new Fight().fightWorkflow({ ...this}, opponent)
     const dbFight = await fight.saveInDb(this.idHero)

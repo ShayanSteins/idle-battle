@@ -2,10 +2,10 @@ const https = require('https')
 const fs = require('fs')
 
 /**
- * Serveur Web
- * @property {Router} router : routeur web
- * @property {Database} database : gestionnaire de base de données
- * @property {http.Server} server : serveur HTTP
+ * Web server
+ * @property {Router} router : web router
+ * @property {Object} conf : server configuration
+ * @property {https.Server} server : HTTPS server
  */
 class Server {
   constructor (conf) {
@@ -22,8 +22,8 @@ class Server {
   }
 
   /**
-   * Enregistrement du routeur web
-   * @param {Router} Router : routeur web
+   * Web router registration
+   * @param {Router} Router : web router
    */
   registerRouter (Router) {
     this.router = Router
@@ -32,7 +32,7 @@ class Server {
   }
 
   /**
-   * Lancement du serveur web
+   * Start web server
    */
   start () {
     this.server.listen(this.conf.port, () => {

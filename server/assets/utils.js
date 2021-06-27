@@ -1,14 +1,15 @@
 const crypto = require('crypto')
 
 const env = {
-  ID_AUTH: 0,
+  GITHUB_AUTH: 0,
   EMAIL_AUTH: 1
 }
 
 /**
- * Fonction d'hachage de mot de passe. Retourne un objet contenant le salt de génération et le mdp haché
+ * Password hash function.  Return an object with the generation salt and hashed password.
  * @param {String} password
  * @param {String} salt
+ * @return {Object} : salt + hashed password
  */
 const hasher = (password, salt = null) => {
   if (salt === null) salt = crypto.randomBytes(Math.ceil(12 / 2)).toString('hex').slice(0, 12)
@@ -22,9 +23,10 @@ const hasher = (password, salt = null) => {
 }
 
 /**
- * Compare le password et le username donné à ceux attendu
+ * Compare password and username send by param to the good ones
  * @param {String} password
  * @param {String} email
+ * @return {Boolean|Error} return true if username and pwd are correct, if not return false. If some params are incorrect of missing, throw an Error.
  */
 const compare = (password = null, email = null, hash = null) => {
   if (password === null || email === null || hash === null) throw new Error('Password and email are required.')
@@ -34,8 +36,11 @@ const compare = (password = null, email = null, hash = null) => {
   return false
 }
 
+/**
+ * Create a UUID, see http://www.ietf.org/rfc/rfc4122.txt
+ * @returns {String} UUID
+ */
 const createUUID = () => {
-  // http://www.ietf.org/rfc/rfc4122.txt
   const s = []
   const hexDigits = '0123456789abcdef'
   for (let i = 0; i < 36; i++) {
