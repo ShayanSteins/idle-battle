@@ -1,5 +1,4 @@
 const https = require('https')
-const { resolve } = require('path')
 const { GET_BY } = require('./assets/utils.js')
 const Database = require('./database.js')
 
@@ -16,9 +15,9 @@ class Login {
    * Manage GitHub authentification
    * @param {Object} conf : OAuthKeysPath configuration
    * @param {Boolean} firstStage : first stage true, second stage false
-   * @param {URL} url 
-   * @param {String} host 
-   * @returns 
+   * @param {URL} url
+   * @param {String} host
+   * @returns
    */
   githubAuth (conf, firstStage = true, url = null, host = null) {
     const { clientId, clientSecret } = require(conf.OAuthKeysPath)
@@ -51,7 +50,7 @@ class Login {
             try {
               datas = JSON.parse(datas.toString())
               const userId = await this.checkGithubToken(datas.access_token)
-              let user = await this.getUserDbIfExist(userId, GET_BY.ID)
+              const user = await this.getUserDbIfExist(userId, GET_BY.ID)
 
               if (user === undefined) await this.database.setGitHubCredentials({ id: userId })
               resolve({ statusCode: 301, cookie: [`token=${datas.access_token}; secure; HttpOnly`, `userId=${userId}; secure; HttpOnly`, 'logged=true'], headers: { Location: `https://${host}/` } })
@@ -61,9 +60,7 @@ class Login {
             }
           })
         }).end(body)
-
       })
-
     } else {
       return { statusCode: 403, returnedDatas: '403 - Access denied' }
     }
@@ -71,7 +68,7 @@ class Login {
 
   /**
    * Manage classic authentification
-   * @param {Request.headers} headers 
+   * @param {Request.headers} headers
    * @returns {Object}
    */
   async loginUser (headers) {
@@ -116,11 +113,12 @@ class Login {
           }
         }
       } catch (error) {
+        let formatedError = error
         if (!error.statusCode) {
           console.error(error)
-          error = { statusCode: 500, returnedDatas: 'Internal server error : Process ending badly.' }
+          formatedError = { statusCode: 500, returnedDatas: 'Internal server error : Process ending badly.' }
         }
-        return error
+        return formatedError
       }
     }
     return { statusCode: 400, returnedDatas: 'Bad request : An error occured during authentification. Please try again.' }
@@ -128,7 +126,7 @@ class Login {
 
   /**
    * Log out te user and reset cookies
-   * @param {Request.headers.cookie} cookies 
+   * @param {Request.headers.cookie} cookies
    * @returns {Object}
    */
   logout (cookies) {
@@ -152,7 +150,7 @@ class Login {
 
   /**
    * Check GitHub token
-   * @param {String} token 
+   * @param {String} token
    * @returns {String} user id
    */
   checkGithubToken (token) {
@@ -186,7 +184,7 @@ class Login {
   /**
    * Get a user if he exist on DB, if not, return undefined
    * @param {String} param : id or email
-   * @param {Integer} type 
+   * @param {Integer} type
    * @returns {Obect|undefined}
    */
   async getUserDbIfExist (param, type) {

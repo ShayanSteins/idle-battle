@@ -121,9 +121,9 @@ class Router {
 
   /**
    * Checking for auth cookies
-   * @param {Request} request 
-   * @param {Response} response 
-   * @param {Login} login 
+   * @param {Request} request
+   * @param {Response} response
+   * @param {Login} login
    * @returns {Object}
    */
   async checkCookieBefore (request, response, login) {

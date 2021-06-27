@@ -11,11 +11,11 @@ const Turn = require("./Turn.js");
  * @property {Array<Turn>} turns
  */
 class Fight {
-  idFight;
-  opponentName;
-  result;
-  dateFight;
-  turns;
+  idFight
+  opponentName
+  result
+  dateFight
+  turns
 
   /**
    * Constructor, mainly used to instanciate a Fight with db datas

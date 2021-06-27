@@ -23,7 +23,7 @@ class Database {
 
   /**
    * Get the instance of DB manager
-   * @param {Object} config 
+   * @param {Object} config
    * @returns {Database|Error}
    */
   static getInstance (config) {
@@ -51,7 +51,7 @@ class Database {
 
   /**
    * Get the user by Id
-   * @param {String} idUser 
+   * @param {String} idUser
    * @returns {Object}
    */
   getUserById (idUser) {
@@ -60,7 +60,7 @@ class Database {
 
   /**
    * Get the user by Email
-   * @param {String} idUser 
+   * @param {String} idUser
    * @returns {Object}
    */
   getUserByEmail (email) {
@@ -69,7 +69,7 @@ class Database {
 
   /**
    * Get heroes by id user
-   * @param {String} idUser 
+   * @param {String} idUser
    * @returns {Object}
    */
   getHerosByUser (idUser) {
@@ -77,7 +77,7 @@ class Database {
     LEFT JOIN Fight as f ON h.idHero = f.idHero 
     LEFT JOIN Turn as t ON f.idFight = t.idFight
     WHERE h.idUser = ? ORDER BY h.idHero, f.dateFight DESC, t.turnNumber ASC`
-      , [idUser])
+    , [idUser])
   }
 
   /**
@@ -90,7 +90,7 @@ class Database {
     */
   getOpponent (cred) {
     return this.executeQuery({
-      namedPlaceholders: true, 
+      namedPlaceholders: true,
       sql: `SELECT h.idHero, h.firstName, h.rankLvl, h.skillPoint, h.health, h.attack, h.defense, h.magik, 
     ABS(:rankLvl - cast(h.rankLvl as signed)) as lvlRange,
     (SELECT count(*) FROM Fight WHERE idHero = h.idHero) as nbFight
@@ -173,7 +173,7 @@ class Database {
 
   /**
    * Remove a Hero and all his related datas (Fight and Turn)
-   * @param {String} idHero 
+   * @param {String} idHero
    * @returns {Object}
    */
   removeHero (idHero) {

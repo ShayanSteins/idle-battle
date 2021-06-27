@@ -11,12 +11,12 @@ const Database = require('../database.js')
  * @property {Integer} loosedHealthHeroA;
  */
 class Turn {
-  idTurn;
-  turnNumber = 1;
-  attackHeroA = 0;
-  loosedHealthHeroB = 0;
-  attackHeroB = 0;
-  loosedHealthHeroA = 0;
+  idTurn
+  turnNumber = 1
+  attackHeroA = 0
+  loosedHealthHeroB = 0
+  attackHeroB = 0
+  loosedHealthHeroA = 0
 
   /**
    * Constructor, mainly used to instanciate a Turn with db datas

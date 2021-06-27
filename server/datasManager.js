@@ -13,12 +13,12 @@ class DatasManager {
 
   /**
    * Get all datas for a user (Heroes, Fights, and Turns)
-   * @param {String} userId 
+   * @param {String} userId
    * @returns {Array<Hero>}
    */
   async getAllUserDatas (userId) {
     let rawDatas = await this.database.getHerosByUser(userId)
-    let heroes = []
+    const heroes = []
 
     if (rawDatas[0] !== undefined) {
       rawDatas = Array.from(rawDatas)
@@ -50,15 +50,15 @@ class DatasManager {
 
   /**
    * Create or update a Hero
-   * @param {String} userId 
-   * @param {Hero} hero 
+   * @param {String} userId
+   * @param {Hero} hero
    * @returns {Object}
    */
   async createUpdateHero (userId, hero) {
     const newHero = Hero.create(hero)
-    newHero.update({ 
-      idHero: hero.idHero === null ? createUUID() : hero.idHero, 
-      idUser: userId 
+    newHero.update({
+      idHero: hero.idHero === null ? createUUID() : hero.idHero,
+      idUser: userId
     })
     await this.database.setHero(newHero)
     return { statusCode: 200, returnedDatas: { idHero: newHero.idHero } }
@@ -66,7 +66,7 @@ class DatasManager {
 
   /**
    * Remove a Hero
-   * @param {Hero} hero 
+   * @param {Hero} hero
    * @returns {Object}
    */
   async removeHero (hero) {
@@ -76,15 +76,15 @@ class DatasManager {
 
   /**
    * Start a new Fight
-   * @param {String} userId 
-   * @param {Hero} hero 
+   * @param {String} userId
+   * @param {Hero} hero
    * @returns {Object}
    */
   async startFight (userId, hero) {
     const opponent = await this.database.getOpponent({ idUser: userId, rankLvl: hero.rankLvl })
 
     if (opponent[0] !== undefined) {
-      let heroObject = await Hero.create({ ...hero, idUser: userId }).startFight(opponent[0])
+      const heroObject = await Hero.create({ ...hero, idUser: userId }).startFight(opponent[0])
       return { statusCode: 200, returnedDatas: heroObject }
     }
     return { statusCode: 400, returnedDatas: 'Sorry... it seems that there is no hero to fight with you.' }

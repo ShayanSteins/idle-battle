@@ -16,16 +16,16 @@ const Fight = require("./Fight.js");
  * @property {Array<Fight>} fights; *
  */
 class Hero {
-  idHero;
-  firstName;
-  rankLvl = 1;
-  skillPoint = 12;
-  health = 10;
-  attack = 0;
-  defense = 0;
-  magik = 0;
-  idUser;
-  fights = [];
+  idHero
+  firstName
+  rankLvl = 1
+  skillPoint = 12
+  health = 10
+  attack = 0
+  defense = 0
+  magik = 0
+  idUser
+  fights = []
 
   /**
    * Constructor, mainly used to instanciate a Hero with db datas
