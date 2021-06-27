@@ -32,6 +32,7 @@ button:hover {
 button:disabled {
   filter: opacity(0.5);
   background-color: var(--main-grey-color);
+  cursor: default;
 }
 .bigBtn {
   padding: 0.4rem 0.5rem;

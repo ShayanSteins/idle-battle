@@ -1,34 +1,39 @@
 <template>
   <div>
-    <div v-if="p_type === $env.CREATION" class="subTitle center">Creation</div>
+    <div v-if="p_type === $mode.CREATION" class="subTitle center">
+      <Button p_type="button" class="iconHelp bold" p_value="?" @click="openCreateDocumentation"></Button>
+      <span>Creation</span>
+    </div>
     <div class="error">{{ errorMsg }}</div>
-    <div v-if="p_type === $env.CREATION && p_nbHeroes === 10" class="error">Your pool is full. Remove a hero before created new one.</div>
+    <div v-if="maxNbHeroesReached" class="error">Your pool is full. Remove a hero before created new one.</div>
     
-    <div v-if="(p_type === $env.CREATION && p_nbHeroes < 10) || p_type === $env.EDITION">
+  
+
+    <div v-if="canCreateHero || p_type === $mode.EDITION">
       <div v-if="maxExceeded" class="error">You spent too much skill point, please adjust your repartition.</div>
       <form @submit.prevent="createUpdate" class="flex fd-col">
-        <div class="flex fa-i-center fj-c-between heroCategories">
-          <div class="flex f-grow fa-i-center"> 
+        <div class="flex align-item-center justify-between heroCategories">
+          <div class="flex f-grow align-item-center"> 
             <label for="heroName" class="heroCategoriesName bold">Name : </label>
-            <label v-if="p_type === $env.EDITION">{{ p_hero.firstName }}</label>
+            <label v-if="p_type === $mode.EDITION">{{ p_hero.firstName }}</label>
             <input v-else type="text" minlength="2" maxlength="30" class="inputHeroName f-grow border-bl" id="heroName" v-model="newHero.firstName" required />          
           </div>
-          <ButtonImage v-if="p_type === $env.EDITION" p_class="right btnIcon" p_type="button" title="Delete"
+          <ButtonImage v-if="p_type === $mode.EDITION" p_class="right btnIcon" p_type="button" title="Delete"
             :p_img="$images.delete"
             @click="remove"
           ></ButtonImage>
         </div>
         <br />
 
-        <div class="heroCategories flex fj-c-between fa-i-center">
+        <div class="heroCategories flex justify-between align-item-center">
           <span class="heroCategoriesName bold">Stats :</span>
-          <span v-if="p_type === $env.EDITION">Rank : {{ p_hero.rankLvl }}</span>
+          <span v-if="p_type === $mode.EDITION">Rank : {{ p_hero.rankLvl }}</span>
           
         </div>
         <div class="heroPropertiesDiv">
           <span class="italic small">Skill points availables : <span :class="{ error: maxExceeded }">{{ newHero.skillPoint }}</span></span>
           <br />
-          <div v-for="stat in $stats" :key="stat.name" class="statsDiv">
+          <div v-for="stat in $stats" :key="stat.name" class="statsDiv align-item-center">
             <span>- {{ stat.displayName }}</span>
             <span>{{ p_hero[stat.name] }}</span>
             <LineStatCalcul v-if="p_hero.skillPoint > 0"
@@ -41,13 +46,13 @@
             ></LineStatCalcul>
           </div>
         </div>
-        <div class="actions">
+        <div class="actions right">
           <Button v-if="p_hero.skillPoint > 0" p_type="button" p_value="Cancel" p_name="cancel" @click="cancel"></Button>
-          <Button v-if="p_type === $env.EDITION && p_hero.skillPoint" p_type="submit" p_value="Save" p_name="save" :disabled="maxExceeded"></Button>
-          <Button v-if="p_type === $env.CREATION" p_type="submit" p_value="Create" p_name="create" :disabled="maxExceeded"></Button>
+          <Button v-if="p_type === $mode.EDITION && p_hero.skillPoint" p_type="submit" p_value="Save" p_name="save" :disabled="maxExceeded"></Button>
+          <Button v-if="p_type === $mode.CREATION" p_type="submit" p_value="Create" p_name="create" :disabled="maxExceeded"></Button>
         </div>
 
-        <div v-if="p_type === $env.EDITION" class="heroCategories">          
+        <div v-if="p_type === $mode.EDITION" class="heroCategories">          
           <span class="heroCategoriesName bold">Fights :</span> 
           <FightList :p_heroName="p_hero.firstName" :p_fights="p_hero.fights"></FightList>
         </div>
@@ -97,6 +102,14 @@ export default {
     p_hero: Object,
     p_type: Number,
     p_nbHeroes: Number
+  },
+  computed: {
+    canCreateHero () {
+      return this.p_type === this.$mode.CREATION && this.p_nbHeroes < 10
+    },
+    maxNbHeroesReached () {
+      return this.p_type === this.$mode.CREATION && this.p_nbHeroes >= 10
+    }
   },
   methods: {
     checkTotalSkillPointAmount (usedSkill, statName, statValue) {
@@ -179,6 +192,9 @@ export default {
         map.set(stat.displayName, 0)
       }
       return map
+    },
+    openCreateDocumentation () {
+      window.open('https://github.com/ShayanSteins/idle-battle#create')
     }
   },
 }
@@ -201,11 +217,9 @@ export default {
 .statsDiv {
   display: grid;
   grid-template-columns: 1fr 1fr 2fr;
-  align-items: center;
   margin-top: 0.3rem;
 }
 .actions {
   margin-top: 1rem;
-  text-align: right;
 }
 </style>

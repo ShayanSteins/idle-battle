@@ -1,5 +1,5 @@
 const mariadb = require('mariadb')
-const { env } = require('./assets/utils.js')
+const { TYPE_ACCOUNT } = require('./assets/utils.js')
 
 /**
  * Database manager, singleton
@@ -107,7 +107,7 @@ class Database {
    * @returns {Object}
    */
   setGitHubCredentials (cred) {
-    return this.executeQuery({ namedPlaceholders: true, sql: `INSERT INTO User (idUser, typeUser) VALUES (:id, ${env.ID_AUTH})` }, cred)
+    return this.executeQuery({ namedPlaceholders: true, sql: `INSERT INTO User (idUser, typeUser) VALUES (:id, ${TYPE_ACCOUNT.GITHUB})` }, cred)
   }
 
   /**
@@ -116,7 +116,7 @@ class Database {
    * @returns {Object}
    */
   setClassicCredentials (cred) {
-    return this.executeQuery({ namedPlaceholders: true, sql: `INSERT INTO User (idUser, typeUser, email, hashedPassword, salt) VALUES (:id, ${env.GITHUB_AUTH}, :email, :hash, :salt)` }, cred)
+    return this.executeQuery({ namedPlaceholders: true, sql: `INSERT INTO User (idUser, typeUser, email, hashedPassword, salt) VALUES (:id, ${TYPE_ACCOUNT.CLASSIC}, :email, :hash, :salt)` }, cred)
   }
 
   /**

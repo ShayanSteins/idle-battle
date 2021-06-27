@@ -1,5 +1,5 @@
 <template>
-<Button class="imageButton" :class="p_class" p_type="button" :p_value="p_value" @click="$emit('click')">
+<Button class="imageButton flex align-item-center" :class="p_class" p_type="button" :p_value="p_value" @click="$emit('click')">
   <template v-slot:content>
     <img :src="p_img" alt="">
   </template>
@@ -13,11 +13,17 @@ export default {
   name: "ButtonImage",
   components: { Button },
   props: {
-    p_value: String,
-    p_img: String,
+    p_img: {
+      type: String,
+      required: true
+    },
     p_class: {
       type: String,
       default: 'btnIcon'
+    },
+    p_value: {
+      type: String,
+      required: false
     }
   }
 }
@@ -25,9 +31,6 @@ export default {
 
 <style scoped>
 .imageButton {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
   margin: auto;
   margin-top: 1rem;
 }
@@ -41,11 +44,5 @@ export default {
 }
 .withText img {
   margin-right: 0.6rem;
-}
-
-@media screen and (min-width: 600px) {
-  .withText img {
-    margin-right: 0.6rem;
-  }
 }
 </style>

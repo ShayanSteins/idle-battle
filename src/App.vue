@@ -2,20 +2,20 @@
   <div>
     <header>
       <div v-if="!isLogged" class="title center">Another not RPG game</div>      
-      <div v-if="isLogged" class="nav flex fa-i-center fj-c-between">        
-        <ButtonImage p_class="menuEl center fa-i-center withText" title="Create" p_value="CREATE" 
+      <div v-if="isLogged" class="nav flex align-item-center justify-between">        
+        <ButtonImage p_class="menuEl justify-center center align-item-center withText" title="Create" p_value="CREATE" 
           :p_img="$images.add_hero"
           @click="navigation($screen.DETAIL)"
          ></ButtonImage>
-         <ButtonImage p_class="menuEl center fa-i-center withText"  title="Pool" p_value="POOL" 
+         <ButtonImage p_class="menuEl justify-center center align-item-center withText"  title="Pool" p_value="POOL" 
           :p_img="$images.pool"
           @click="navigation($screen.LIST)"
          ></ButtonImage>
-         <ButtonImage p_class="menuEl center fa-i-center withText" title="Fight !" p_value="FIGHT !" 
+         <ButtonImage p_class="menuEl justify-center center align-item-center withText" title="Fight !" p_value="FIGHT !" 
           :p_img="$images.fight"
           @click="navigation($screen.FIGHT)"
          ></ButtonImage>
-         <ButtonImage p_class="menuEl center fa-i-center withText" title="Log out" p_value="Log out" 
+         <ButtonImage p_class="menuEl justify-center center align-item-center withText" title="Log out" p_value="Log out" 
           :p_img="$images.logout"
           @click="logout"
          ></ButtonImage>
@@ -23,19 +23,19 @@
     </header>
 
     <div class="content">
+
       <span class="error left">{{ errorMsg }}</span>
       <div class="loginDiv center flex fd-col" v-if="!isLogged">
-        <form @submit.prevent="login" class="flex fd-col">
-          
+        <form @submit.prevent="login" class="flex fd-col justify-around">          
           <label for="email" class="notDisplayed">Email</label>
           <input type="email" class="formInput border-bl" id="email" v-model="form.email" placeholder="Email" required />        
         
           <label for="pwd" class="notDisplayed">Password</label>
           <input type="password" class="formInput border-bl" id="pwd" v-model="form.pwd" placeholder="Password" minlength="8" maxlength="18" required />        
 
-          <div class="formButton">
-            <Button p_type="submit" p_class="bigBtn" p_value="Register" p_name="register"></Button>
+          <div class="justify-evenly flex fd-reverse-row">
             <Button p_type="submit" p_class="bigBtn" p_value="Sign In" p_name="signIn"></Button>
+            <Button p_type="submit" p_class="bigBtn" p_value="Register" p_name="register"></Button>
           </div>
         </form>
         <div>or</div>
@@ -46,7 +46,7 @@
         <HeroDetail
           v-if="displayScreen === $screen.DETAIL"
           :p_hero="newHero"
-          :p_type="$env.CREATION"
+          :p_type="$mode.CREATION"
           :p_nbHeroes="heroes.length"
           @addHero="addHero"
         ></HeroDetail>
@@ -63,6 +63,11 @@
         ></Fight>
       </div>
     </div>
+
+    <footer v-if="!isLogged" class="flex justify-between align-item-center">
+      <span class="italic">Made by Floriane Dutin</span>
+      <span><a href="https://github.com/ShayanSteins/idle-battle#login" target="_blank">Help !</a></span>
+    </footer>
   </div>
 </template>
 
@@ -181,7 +186,6 @@ export default {
 
 <style>
 :root {
-  --content-padding: 1rem;
   --main-black-color: rgba(36, 36, 36, 1);
   --main-grey-color: rgba(88, 88, 88, 1);
   --main-white-color: rgba(236, 236, 236, 1);
@@ -202,7 +206,6 @@ export default {
 html,
 body {
   margin: 0;
-  /* width: 100vw; */
   font-family: sans-serif;
   font-size: 1rem;
   color: var(--main-white-color);
@@ -244,10 +247,22 @@ body {
 .fd-col {
   flex-direction: column;
 }
-.fj-c-between {
+.fd-reverse-row {
+  flex-direction: row-reverse;
+}
+.justify-center {
+  justify-content: center;
+}
+.justify-between {
   justify-content: space-between;
 }
-.fa-i-center {
+.justify-evenly {
+  justify-content: space-evenly;
+}
+.justify-around {
+  justify-content: space-around;
+}
+.align-item-center {
   align-items: center;
 }
 .error {
@@ -260,10 +275,30 @@ body {
 .separator {
   margin: 1rem;
 }
+.iconHelp {
+  float: left;
+  width: fit-content;
+}
+
+footer {
+  width: calc(100vw - 2rem);
+  position: fixed;
+  bottom: 0;
+  padding: 0.8rem 1rem;
+  color: var(--darker-white-color);
+  background-color: var(--main-black-color);
+}
 
 input {
   background-color: var(--main-black-color);
   color: var(--main-white-color);
+}
+
+a {
+  color: var(--main-white-color);
+}
+a:hover {
+  color: var(--main-orange-color);
 }
 
 .title {
@@ -285,7 +320,6 @@ input {
   z-index: 999;
 }
 .nav .menuEl {
-  justify-content: center;
   border: none;
   border-bottom: 1px solid var(--main-white-color);
   border-right: 1px solid var(--main-white-color);
@@ -296,12 +330,15 @@ input {
 .nav .menuEl:last-child {
   border-right: none;
 }
+.nav .menuEl img {
+  margin-right: 0;
+}
 .nav .menuEl span {
   display: none;
 }
 
 .content {
-  padding: var(--content-padding);
+  padding: 1rem;
   margin-top: 4rem;
 }
 .notDisplayed {
@@ -309,17 +346,12 @@ input {
 }
 .loginDiv form {
   margin: 0.6rem;
-  justify-content: space-around;
 }
 .loginDiv .formInput {
   width: 100%;
   box-sizing: border-box;
   padding: 0.4rem;
   margin: 0.8rem 0;
-}
-.formButton {
-  display: flex;
-  justify-content: space-evenly;
 }
 
 @media screen and (min-width: 600px) {
@@ -339,6 +371,9 @@ input {
     margin-top: 4rem;
   }
 
+  .nav .menuEl img {
+    margin-right: 0.6rem;
+  }
   .nav .menuEl span {
     display: block;
   }

@@ -1,8 +1,13 @@
 const crypto = require('crypto')
 
-const env = {
-  GITHUB_AUTH: 0,
-  EMAIL_AUTH: 1
+const TYPE_ACCOUNT = {
+  GITHUB: 0,
+  CLASSIC: 1
+}
+
+const GET_BY = {
+  ID: 0,
+  EMAIL: 1
 }
 
 /**
@@ -54,7 +59,8 @@ const createUUID = () => {
 }
 
 module.exports = {
-  env,
+  TYPE_ACCOUNT,
+  GET_BY,
   hasher,
   compare,
   createUUID

@@ -3,7 +3,7 @@
     <div class="vsDiv center"><span>{{ p_heroName }}</span> VS <span>{{ p_fight.opponentName }}</span></div>
 
     <div v-for="turn in p_fight.turns" :key="turn.idTurn">
-      <div class="turn">Turn n°{{ turn.turnNumber }}</div>
+      <div class="turn bold">Turn n°{{ turn.turnNumber }}</div>
       <div class="turnA subTurn italic">
         <div v-if="turn.attackHeroA === 0 && turn.loosedHealthHeroB === 0">
           <div class="missed">{{ p_heroName }} missed his attack</div>
@@ -49,7 +49,6 @@ export default {
   font-size: 1.2rem;
 }
 .turn {
-  font-weight: bold;
   display: block;
   margin: 1rem 0 0.3rem 0;
 }

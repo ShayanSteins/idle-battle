@@ -6,7 +6,10 @@
       It seems you don't have any Hero in your pool...
     </div>
     <div v-else>
-      <div class="selectHeroLabel">Choose your hero :</div>
+      <div class="selectHeroLabel flex justify-between align-item-center">
+        <span>Choose your hero :</span>
+        <Button p_type="button" class="bold" p_value="?" @click="openFightDocumentation"></Button>
+      </div>
       <select class="selectHero" v-model="selectedHero" @change="initDisplayFight">
         <option disabled value="">Choose...</option>
         <option v-for="hero in availableHeros" :key="hero.idHero" :value="hero">
@@ -16,7 +19,7 @@
       <span class="infoFight italic tinny">Only heroes that have not loosed a fight in the past hour and have at least one attack point will be on the list.</span>
       <Button p_class="fightBtn" p_value="Fight !" :disabled="!canHeFight" @click="startFight"></Button>
       
-      <div v-if="displayFight" class="flex fd-col fa-i-center">
+      <div v-if="displayFight" class="flex fd-col align-item-center">
         <div class="center separator">- - - - - - - - - - - - - - - - - - - - -</div>
 
         <span class="subTitle fightTitle center">FIGHT !</span>
@@ -69,15 +72,14 @@ export default {
       return availableHeroes
     },
     canHeFight () {
-      if(this.selectedHero === '') return false
-      else if(this.newFight !== null && this.newFight.result === 0) return false
+      if (this.selectedHero === '') return false
+      else if (this.newFight !== null && this.newFight.result === 0) return false
       return true
     }
   },
   methods: {
     async startFight () {
       try {
-        console.log(this.selectedHero)
         const response = await fetch('/start-fight', {
           method: 'POST',
           credentials: 'same-origin',
@@ -92,7 +94,10 @@ export default {
         this.selectedHeroName = this.selectedHero.firstName
         this.$emit('updateHero', datas)
 
-        if (this.newFight.result === 0) {
+        const updatedHero = this.p_list.find(hero => hero.idHero === datas.idHero)
+        if (this.newFight.result === 1 && updatedHero) {
+          this.selectedHero = updatedHero
+        } else {
           this.selectedHero = ''
         }
 
@@ -103,10 +108,13 @@ export default {
         this.errorMsg = error
       }
     },
-    initDisplayFight() {
+    initDisplayFight () {
       this.displayFight = false
       this.newFight = null
       this.selectedHeroName = null
+    },
+    openFightDocumentation () {
+      window.open('https://github.com/ShayanSteins/idle-battle#fight')
     }
   }
 }

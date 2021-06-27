@@ -19,7 +19,7 @@ export const Store = {
     type: 'divideBy5'
   }],
 
-  env: {
+  mode: {
     CREATION: 0,
     EDITION: 1
   },
@@ -33,7 +33,7 @@ export const Store = {
 
 Store.install = function (Vue, option) {
   Vue.prototype.$stats = Store.stats
-  Vue.prototype.$env = Store.env
+  Vue.prototype.$mode = Store.mode
   Vue.prototype.$screen = Store.screen
   Vue.prototype.$images = Images
 }

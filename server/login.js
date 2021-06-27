@@ -1,6 +1,6 @@
 const https = require('https')
 const { resolve } = require('path')
-const { env } = require('./assets/utils.js')
+const { GET_BY } = require('./assets/utils.js')
 const Database = require('./database.js')
 
 /**
@@ -51,7 +51,7 @@ class Login {
             try {
               datas = JSON.parse(datas.toString())
               const userId = await this.checkGithubToken(datas.access_token)
-              let user = await this.getUserDbIfExist(userId, env.ID_AUTH)
+              let user = await this.getUserDbIfExist(userId, GET_BY.ID)
 
               if (user === undefined) await this.database.setGitHubCredentials({ id: userId })
               resolve({ statusCode: 301, cookie: [`token=${datas.access_token}; secure; HttpOnly`, `userId=${userId}; secure; HttpOnly`, 'logged=true'], headers: { Location: `https://${host}/` } })
@@ -80,7 +80,7 @@ class Login {
       const [email, pwd, type] = credentials.split(':')
 
       try {
-        const exist = await this.getUserDbIfExist(email, env.EMAIL_AUTH)
+        const exist = await this.getUserDbIfExist(email, GET_BY.EMAIL)
         const { hasher, createUUID, compare } = require('./assets/utils.js')
 
         if (type === 'register') { // Type register
@@ -185,17 +185,17 @@ class Login {
 
   /**
    * Get a user if he exist on DB, if not, return undefined
-   * @param {String} id 
+   * @param {String} param : id or email
    * @param {Integer} type 
    * @returns {Obect|undefined}
    */
-  async getUserDbIfExist (id, type) {
+  async getUserDbIfExist (param, type) {
     let dbCred = []
 
-    if (type === env.ID_AUTH) {
-      dbCred = await this.database.getUserById(id)
+    if (type === GET_BY.ID) {
+      dbCred = await this.database.getUserById(param)
     } else {
-      dbCred = await this.database.getUserByEmail(id)
+      dbCred = await this.database.getUserByEmail(param)
     }
     return dbCred[0]
   }

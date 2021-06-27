@@ -1,8 +1,8 @@
 <template>
-  <div class="variables">
+  <div class="variables center align-item-center">
     <Button p_type="button" p_class="smallBtn" p_value="-" @click="calculStat('less')"></Button>
     <!-- <input type="button" @click="calculStat('less')" value="-" /> -->
-    <span class="green statVal bold">{{ newStatValue }}</span>
+    <span class="green bold">{{ newStatValue }}</span>
     <Button p_type="button" p_class="smallBtn" p_value="+" :disabled="p_maxReached" @click="calculStat('more')"></Button>
     <!-- <input type="button" @click="calculStat('more')" value="+" :disabled="p_maxReached" /> -->
     <span>(+{{ usedSkillPoint }})</span>
@@ -60,10 +60,5 @@ export default {
   display: grid;
   grid-template-columns: repeat(2, 1fr 2fr);
   grid-column-gap: 10px;
-  text-align: center;
-  align-items: center;
-}
-.statVal {
-  /* font-weight: bold; */
 }
 </style>

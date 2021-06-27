@@ -1,5 +1,5 @@
 const fs = require('fs')
-const { env } = require('./assets/utils.js')
+const { GET_BY } = require('./assets/utils.js')
 const DatasManager = require('./datasManager')
 const Login = require('./login')
 
@@ -130,7 +130,7 @@ class Router {
     try {
       if (request.headers.cookie) {
         const userId = request.headers.cookie.split(';').find(a => a.includes('userId=')).split('=')[1]
-        const user = await login.getUserDbIfExist(userId, env.ID_AUTH)
+        const user = await login.getUserDbIfExist(userId, GET_BY.ID)
         if (user !== undefined) {
           let concatedDatas = Buffer.alloc(0)
           request.on('data', datas => {
